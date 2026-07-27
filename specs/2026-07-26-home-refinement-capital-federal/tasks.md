@@ -11,6 +11,11 @@
 - [x] Destacar el CTA y unificar el correo comercial.
 - [x] Corregir logo y alineación en header y footer.
 - [x] Validar layout desktop, reglas responsive y build.
+- [x] Extraer y aplicar la paleta oficial del manual de identidad.
+- [x] Cambiar el logo materializado del header por la versión negra.
+- [x] Reordenar la home con “Próxima conversación” después del hero.
+- [x] Alinear las tres tarjetas con imagen y texto en una fila uniforme.
+- [x] Incorporar el formulario de contacto como última sección.
 
 ## Next
 

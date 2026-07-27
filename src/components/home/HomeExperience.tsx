@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import ContactForm from "@/components/forms/ContactForm";
 import { COMPANY_INFO } from "@/lib/constants";
 
 const heroChapters = [
@@ -412,9 +413,38 @@ export default function HomeExperience() {
       </section>
 
       <section
-        className="agency-section agency-section--services"
+        className="agency-section agency-section--contact"
         data-header-boundary
       >
+        <div className="section-shell closing-panel" data-reveal>
+          <div>
+            <p className="eyebrow">Próxima conversación</p>
+            <h2>Una búsqueda bien acompañada empieza mucho antes de una visita.</h2>
+          </div>
+
+          <div className="closing-panel__body">
+            <p>
+              Contanos qué querés cambiar, dónde imaginás tu próxima etapa y
+              cuáles son tus prioridades. Nosotros convertimos esa intención en
+              una búsqueda concreta.
+            </p>
+            <div className="closing-panel__actions">
+              <a
+                href={`mailto:${COMPANY_INFO.email}?subject=Quiero%20coordinar%20una%20próxima%20visita`}
+                className="closing-panel__primary"
+              >
+                Coordinar próxima visita
+                <ArrowIcon />
+              </a>
+              <a href={`mailto:${COMPANY_INFO.email}`}>
+                {COMPANY_INFO.email}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="agency-section agency-section--services">
         <div className="section-shell agency-grid">
           <div className="agency-grid__headline" data-reveal>
             <p className="eyebrow">Cómo trabaja el estudio</p>
@@ -444,31 +474,22 @@ export default function HomeExperience() {
         </div>
       </section>
 
-      <section className="agency-section agency-section--contact">
-        <div className="section-shell closing-panel" data-reveal>
-          <div>
-            <p className="eyebrow">Próxima conversación</p>
-            <h2>Una búsqueda bien acompañada empieza mucho antes de una visita.</h2>
-          </div>
-
-          <div className="closing-panel__body">
+      <section className="agency-section agency-section--form" id="contacto">
+        <div className="section-shell contact-layout">
+          <div className="contact-layout__intro" data-reveal>
+            <p className="eyebrow eyebrow--light">Contacto</p>
+            <h2>Hablemos de tu próxima decisión.</h2>
             <p>
-              Contanos qué querés cambiar, dónde imaginás tu próxima etapa y
-              cuáles son tus prioridades. Nosotros convertimos esa intención en
-              una búsqueda concreta.
+              Dejanos tus datos y una breve idea de lo que necesitás. El equipo
+              de Boetto te responde con una primera orientación concreta.
             </p>
-            <div className="closing-panel__actions">
-              <a
-                href={`mailto:${COMPANY_INFO.email}?subject=Quiero%20coordinar%20una%20próxima%20visita`}
-                className="closing-panel__primary"
-              >
-                Coordinar próxima visita
-                <ArrowIcon />
-              </a>
-              <a href={`mailto:${COMPANY_INFO.email}`}>
-                {COMPANY_INFO.email}
-              </a>
-            </div>
+            <a href={`mailto:${COMPANY_INFO.email}`}>
+              {COMPANY_INFO.email}
+            </a>
+          </div>
+          <div className="contact-layout__form" data-reveal>
+            <p className="contact-layout__form-label">Contanos qué estás buscando</p>
+            <ContactForm variant="editorial" />
           </div>
         </div>
       </section>

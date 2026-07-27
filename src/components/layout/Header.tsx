@@ -75,8 +75,8 @@ export default function Header() {
           preload
         />
         <Image
-          className="site-header__logo-image site-header__logo-image--color"
-          src="/logos/logo-color.svg"
+          className="site-header__logo-image site-header__logo-image--dark"
+          src="/logos/logo-black.svg"
           alt=""
           aria-hidden="true"
           width={220}
