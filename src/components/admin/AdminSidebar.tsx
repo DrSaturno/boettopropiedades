@@ -97,19 +97,24 @@ export default function AdminSidebar() {
         })}
       </nav>
 
-      <div className="border-t border-white/10 p-4">
-        <Link
-          href="/"
-          className="mb-3 block text-xs font-medium text-white/60 transition-colors hover:text-white"
-        >
-          Ver sitio web
-        </Link>
-        <button
-          onClick={() => signOut({ callbackUrl: "/admin/login" })}
-          className="cursor-pointer text-xs font-medium text-white/60 transition-colors hover:text-white"
-        >
-          Cerrar sesion
-        </button>
+      <div className="border-t border-white/10 p-4 flex flex-col items-center">
+        <div className="w-full flex justify-between mb-6 px-1">
+          <Link
+            href="/"
+            className="text-xs font-medium text-white/60 transition-colors hover:text-white"
+          >
+            Ver sitio web
+          </Link>
+          <button
+            onClick={() => signOut({ callbackUrl: "/admin/login" })}
+            className="cursor-pointer text-xs font-medium text-white/60 transition-colors hover:text-white"
+          >
+            Cerrar sesion
+          </button>
+        </div>
+        <div className="text-[10px] uppercase tracking-wider text-white/30 text-center">
+          By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
+        </div>
       </div>
     </aside>
   );

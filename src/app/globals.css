@@ -2268,6 +2268,23 @@ textarea:-webkit-autofill {
   .footer-modern__brand img {
     margin-inline: auto;
   }
+
+  .footer-modern__nav nav {
+    align-items: center;
+  }
+
+  .footer-modern__socials {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-modern__bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
