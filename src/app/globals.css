@@ -302,7 +302,6 @@ button {
 }
 
 .site-nav a,
-.site-nav__more > button,
 .site-header__inquiry {
   position: relative;
   padding-block: 10px;
@@ -329,67 +328,6 @@ button {
 .site-nav > a:hover::after {
   transform: scaleX(1);
   transform-origin: left;
-}
-
-.site-nav__more {
-  position: relative;
-}
-
-.site-nav__more > button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.site-nav__more > button i {
-  width: 6px;
-  height: 6px;
-  border-right: 1px solid currentColor;
-  border-bottom: 1px solid currentColor;
-  transform: translateY(-2px) rotate(45deg);
-  transition: transform 180ms ease;
-}
-
-.site-nav__more.is-open > button i {
-  transform: translateY(2px) rotate(225deg);
-}
-
-.site-nav__submenu {
-  position: absolute;
-  top: calc(100% + 14px);
-  left: -22px;
-  display: grid;
-  min-width: 210px;
-  padding: 10px;
-  border: 1px solid rgba(23, 24, 21, 0.1);
-  border-radius: 16px;
-  background: #fff;
-  opacity: 0;
-  pointer-events: none;
-  box-shadow: 0 18px 42px rgba(23, 24, 21, 0.12);
-  transform: translateY(-8px);
-  transition:
-    opacity 180ms ease,
-    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.site-nav__submenu a {
-  padding: 11px 12px;
-  border-radius: 10px;
-  color: #4d4e48;
-  font-size: 0.72rem;
-}
-
-.site-nav__submenu a:hover {
-  background: rgba(197, 160, 92, 0.14);
-  color: var(--ink);
-}
-
-.site-nav__more.is-open .site-nav__submenu,
-.site-nav__more:hover .site-nav__submenu {
-  opacity: 1;
-  pointer-events: auto;
-  transform: none;
 }
 
 .site-header__inquiry {
@@ -1615,6 +1553,14 @@ button {
   padding-bottom: 80px;
   max-width: 1440px;
   margin-inline: auto;
+  text-align: center;
+}
+
+.footer-modern__grid > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
 }
 
 .footer-modern__brand img {
@@ -1624,16 +1570,36 @@ button {
   margin-bottom: 45px;
 }
 
-.footer-modern__brand p,
+.footer-modern__brand > p,
 .footer-modern__contact-link,
-.footer-modern__office p,
+.footer-modern__office .footer-modern__row,
 .footer-modern__socials a {
-  display: block;
   margin: 0 0 12px;
   color: rgba(255, 255, 255, 0.6);
   font-size: 0.78rem;
   line-height: 1.5;
   transition: color 250ms ease;
+}
+
+.footer-modern .footer-modern__row {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.footer-modern .footer-modern__row > svg {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.footer-modern .footer-modern__row > p {
+  margin: 0;
 }
 
 .footer-modern__contact-link:hover,
@@ -1800,8 +1766,7 @@ textarea:-webkit-autofill {
     transform: none;
   }
 
-  .site-nav > a,
-  .site-nav__more > button {
+  .site-nav > a {
     font-family: var(--font-playfair), Georgia, serif;
     font-size: 2.4rem;
     font-weight: 400;
@@ -1825,44 +1790,6 @@ textarea:-webkit-autofill {
 
   .site-header.is-menu-open .menu-button {
     color: #fff;
-  }
-
-  .site-nav__more {
-    width: 100%;
-  }
-
-  .site-nav__more > button {
-    justify-content: space-between;
-    width: 100%;
-    color: #fff;
-  }
-
-  .site-nav__submenu {
-    position: static;
-    overflow: hidden;
-    min-width: 0;
-    max-height: 0;
-    padding: 0 0 0 18px;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-    opacity: 1;
-    transform: none;
-    transition: max-height 260ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .site-nav__more.is-open .site-nav__submenu {
-    max-height: 180px;
-    padding-top: 8px;
-  }
-
-  .site-nav__submenu a {
-    padding: 7px 0;
-    color: rgba(255, 255, 255, 0.7);
-    font-family: var(--font-dm-sans), Arial, sans-serif;
-    font-size: 0.76rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   .hero {
@@ -2262,6 +2189,19 @@ textarea:-webkit-autofill {
     gap: 45px;
   }
 
+  .footer-modern__grid > div {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .footer-modern .footer-modern__row {
+    display: inline-flex;
+    margin-inline: auto;
+    align-items: center;
+    justify-content: center;
+  }
+
   .footer-modern__brand img {
     margin-inline: auto;
   }
@@ -2270,8 +2210,10 @@ textarea:-webkit-autofill {
     align-items: center;
   }
 
+  .footer-modern__office,
   .footer-modern__socials {
     display: flex;
+    width: 100%;
     flex-direction: column;
     align-items: center;
   }
