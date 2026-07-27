@@ -85,22 +85,10 @@ export default function Footer() {
 
       <div className="footer-modern__bottom">
         <span>© {new Date().getFullYear()} Boetto Propiedades</span>
+        <span>
+          By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
+        </span>
         <span>Privacidad · Terminos</span>
-        <span>Hecho con criterio en Capital Federal</span>
-      </div>
-
-      <div 
-        style={{ 
-          textAlign: "center", 
-          width: "100%", 
-          paddingBottom: "40px", 
-          color: "rgba(255,255,255,0.4)", 
-          fontSize: "0.65rem", 
-          letterSpacing: "0.08em",
-          textTransform: "uppercase"
-        }}
-      >
-        By <span style={{ filter: "grayscale(1) brightness(10)", display: "inline-block", margin: "0 2px" }}>🪐</span> DrSaturno
       </div>
 
       <div className="footer-modern__mega-text" aria-hidden="true">
