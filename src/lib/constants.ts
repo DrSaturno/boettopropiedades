@@ -27,13 +27,14 @@ export const PROPERTY_STATUS = [
   { value: "paused", label: "Pausada" },
 ] as const;
 
-export const WHATSAPP_NUMBER = "5411456323842";
+export const WHATSAPP_NUMBER = "5491145632384";
 export const WHATSAPP_MESSAGE =
   "Hola, me comunico desde la web de Boetto Propiedades. Me gustaría hacer una consulta.";
 
 export const COMPANY_INFO = {
   name: "Boetto Propiedades",
-  phone: "+54 11 4563-2384",
+  phone: "11 4563-2384",
+  phoneHref: "+541145632384",
   email: "ventas@boettopropiedades.com",
   instagram: "boettopropiedades",
   address: "Carlos Antonio Lopez 3483, Capital Federal",

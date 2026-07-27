@@ -54,7 +54,7 @@ export default function ContactoPage() {
               </div>
               <div>
                 <p className="text-xs uppercase tracking-widest text-brand-dark/50 mb-2">Contacto</p>
-                <a href={`tel:${COMPANY_INFO.phone}`} className="block text-sm text-brand-dark hover:text-brand-sage transition-colors mb-1">
+                <a href={`tel:${COMPANY_INFO.phoneHref}`} className="block text-sm text-brand-dark hover:text-brand-sage transition-colors mb-1">
                   {COMPANY_INFO.phone}
                 </a>
                 <a href={`mailto:${COMPANY_INFO.email}`} className="block text-sm text-brand-dark hover:text-brand-sage transition-colors">

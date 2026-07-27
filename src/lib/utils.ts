@@ -1,4 +1,4 @@
-import { CURRENCIES } from "./constants";
+import { CURRENCIES, WHATSAPP_NUMBER } from "./constants";
 
 export function slugify(text: string): string {
   return text
@@ -29,7 +29,7 @@ export function formatArea(area: number | null | undefined): string {
   return `${area} m²`;
 }
 
-export function getWhatsAppUrl(message: string, phone: string = "5411456323842"): string {
+export function getWhatsAppUrl(message: string, phone: string = WHATSAPP_NUMBER): string {
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
 

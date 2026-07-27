@@ -520,6 +520,20 @@ button {
   }
 }
 
+@keyframes mobile-scroll-cue {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -4px, 0);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, 9px, 0);
+  }
+}
+
 /* Search */
 
 .search-stage {
@@ -2265,6 +2279,7 @@ textarea:-webkit-autofill {
   min-height: 400svh;
   background: var(--brand-charcoal);
   color: #fff;
+  touch-action: pan-y;
 }
 
 .scroll-hero__sticky {
@@ -2272,6 +2287,7 @@ textarea:-webkit-autofill {
   top: 0;
   height: 100svh;
   overflow: hidden;
+  touch-action: pan-y;
 }
 
 .scroll-hero__video {
@@ -2305,7 +2321,8 @@ textarea:-webkit-autofill {
 .scroll-hero__meta,
 .scroll-hero__vertical,
 .scroll-hero__chapters,
-.scroll-hero__navigation {
+.scroll-hero__navigation,
+.scroll-hero__mobile-cue {
   position: relative;
   z-index: 2;
 }
@@ -2423,6 +2440,58 @@ textarea:-webkit-autofill {
   color: rgba(255, 255, 255, 0.74);
   font-size: 0.98rem;
   line-height: 1.8;
+}
+
+.scroll-hero__mobile-cue {
+  position: absolute;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  left: 50%;
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px 9px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 999px;
+  background: rgba(11, 11, 11, 0.24);
+  color: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  backdrop-filter: blur(14px) saturate(120%);
+  transition:
+    opacity 220ms ease,
+    transform 220ms ease;
+}
+
+.scroll-hero__mobile-cue i {
+  position: relative;
+  display: block;
+  width: 19px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+}
+
+.scroll-hero__mobile-cue i::after {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  width: 3px;
+  height: 7px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+  transform: translate3d(-50%, -3px, 0);
+  animation: mobile-scroll-cue 1500ms ease-in-out infinite;
+}
+
+.scroll-hero__mobile-cue.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-50%, 8px, 0);
 }
 
 .scroll-hero__cta {
@@ -3511,6 +3580,10 @@ textarea:-webkit-autofill {
     display: none;
   }
 
+  .scroll-hero__mobile-cue {
+    display: inline-flex;
+  }
+
   .agency-section--search,
   .agency-section--services,
   .agency-section--districts,
@@ -3804,6 +3877,10 @@ textarea:-webkit-autofill {
   }
 
   .scroll-hero__navigation {
+    display: none;
+  }
+
+  .scroll-hero__mobile-cue {
     display: none;
   }
 }

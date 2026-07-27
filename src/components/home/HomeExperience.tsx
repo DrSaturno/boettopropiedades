@@ -287,6 +287,29 @@ export default function HomeExperience() {
     );
   }
 
+  function handleHeroNudge() {
+    const hero = heroRef.current;
+
+    if (!hero) return;
+
+    const viewport = window.innerHeight || 1;
+    const heroTop = window.scrollY + hero.getBoundingClientRect().top;
+    const total = Math.max(hero.offsetHeight - viewport, 1);
+    const currentProgress = Math.min(
+      Math.max((window.scrollY - heroTop) / total, 0),
+      1
+    );
+    const nextProgress = Math.min(
+      Math.max(currentProgress + 0.27, 0.27),
+      1
+    );
+
+    window.scrollTo({
+      top: heroTop + total * nextProgress,
+      behavior: "smooth",
+    });
+  }
+
   const filteredLocations = locationQuery.trim()
     ? locationOptions.filter(({ place, context }) =>
         `${place} ${context}`
@@ -435,6 +458,17 @@ export default function HomeExperience() {
             ))}
           </div>
 
+          <button
+            type="button"
+            className={`scroll-hero__mobile-cue ${
+              activeChapter > 0 ? "is-hidden" : ""
+            }`}
+            onClick={handleHeroNudge}
+            aria-label="Avanzar en el recorrido"
+          >
+            <span>Desliza</span>
+            <i aria-hidden="true" />
+          </button>
 
         </div>
       </section>
