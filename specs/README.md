@@ -16,3 +16,6 @@ Documenta el refinamiento a cuatro capítulos, el header contextual, las tarjeta
 
 `2026-07-26-inquiry-email-delivery`
 Documenta la persistencia y notificación SMTP de consultas al correo comercial.
+
+`2026-07-27-brand-siteground-supabase`
+Documenta la identidad negro/dorado/blanco, el correo del hosting y la migración operativa a Supabase.

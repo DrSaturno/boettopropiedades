@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { OPERATIONS, PROPERTY_TYPES, CURRENCIES, PROPERTY_STATUS, AMENITIES_LIST } from "@/lib/constants";
+import { OPERATIONS, PROPERTY_TYPES, CURRENCIES, AMENITIES_LIST } from "@/lib/constants";
 
 interface ScrapedData {
   title: string;
@@ -99,7 +99,7 @@ export default function ImportPropertyPage() {
           address: data.address,
           neighborhood: data.neighborhood,
           city: data.city,
-          province: "Córdoba",
+          province: "Ciudad Autónoma de Buenos Aires",
           description: data.description,
           totalArea: data.totalArea ? Number(data.totalArea) : null,
           coveredArea: data.coveredArea ? Number(data.coveredArea) : null,

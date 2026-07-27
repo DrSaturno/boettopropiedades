@@ -3,6 +3,17 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import {
+  getPropertyImagesBucket,
+  getSupabaseAdmin,
+} from "@/lib/supabase/admin";
+
+const extensionByMimeType: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/avif": "avif",
+};
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
@@ -16,8 +27,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No se envió un archivo" }, { status: 400 });
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-    if (!allowedTypes.includes(file.type)) {
+    const extension = extensionByMimeType[file.type];
+    if (!extension) {
       return NextResponse.json({ error: "Tipo de archivo no permitido" }, { status: 400 });
     }
 
@@ -28,12 +39,28 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const ext = file.name.split(".").pop() || "jpg";
     const safeName = file.name
       .replace(/\.[^.]+$/, "")
       .replace(/[^a-zA-Z0-9_-]/g, "_")
       .slice(0, 50);
-    const filename = `${safeName}-${Date.now()}.${ext}`;
+    const filename = `${safeName}-${Date.now()}.${extension}`;
+
+    if (process.env.SUPABASE_STORAGE_ENABLED === "true") {
+      const bucket = getPropertyImagesBucket();
+      const objectPath = `properties/${filename}`;
+      const supabase = getSupabaseAdmin();
+      const { error } = await supabase.storage
+        .from(bucket)
+        .upload(objectPath, buffer, {
+          contentType: file.type,
+          upsert: false,
+        });
+
+      if (error) throw error;
+
+      const { data } = supabase.storage.from(bucket).getPublicUrl(objectPath);
+      return NextResponse.json({ url: data.publicUrl });
+    }
 
     const uploadDir = path.join(process.cwd(), "public", "uploads");
     await mkdir(uploadDir, { recursive: true });

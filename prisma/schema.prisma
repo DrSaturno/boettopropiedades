@@ -21,7 +21,7 @@ model Property {
   address        String?
   neighborhood   String?
   city           String?
-  province       String    @default("Córdoba")
+  province       String    @default("Ciudad Autónoma de Buenos Aires")
   description    String?
   totalArea      Float?
   coveredArea    Float?

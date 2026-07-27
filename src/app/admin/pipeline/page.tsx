@@ -15,6 +15,19 @@ interface Deal {
   updatedAt: string;
 }
 
+interface PipelineInquiry {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string | null;
+  message?: string | null;
+  createdAt: string;
+  property?: {
+    title: string;
+    price?: number | null;
+  } | null;
+}
+
 const STAGES = [
   { id: "prospect", name: "Prospecto", color: "border-t-slate-500" },
   { id: "contacted", name: "Contactado", color: "border-t-blue-500" },
@@ -43,7 +56,7 @@ export default function AdminPipelinePage() {
     // We load inquiries from database as base deals and add mock pipeline deals
     fetch("/api/consultas")
       .then((r) => r.json())
-      .then((data: any[]) => {
+      .then((data: PipelineInquiry[]) => {
         const dbDeals: Deal[] = data.slice(0, 3).map((inq, index) => {
           const stages: Deal["stage"][] = ["prospect", "contacted", "visit"];
           return {

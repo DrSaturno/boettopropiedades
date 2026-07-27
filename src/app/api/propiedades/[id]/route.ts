@@ -39,7 +39,7 @@ export async function PUT(request: Request, context: RouteContext) {
         address: body.address || null,
         neighborhood: body.neighborhood || null,
         city: body.city || null,
-        province: body.province || "Córdoba",
+        province: body.province || "Ciudad Autónoma de Buenos Aires",
         description: body.description || null,
         totalArea: body.totalArea != null ? Number(body.totalArea) : null,
         coveredArea: body.coveredArea != null ? Number(body.coveredArea) : null,

@@ -95,29 +95,29 @@ export async function sendInquiryEmail(payload: InquiryEmailPayload) {
   const rows = details
     .map(
       ([key, value]) =>
-        `<tr><td style="padding:8px 16px 8px 0;color:#989282">${escapeHtml(
+        `<tr><td style="padding:8px 16px 8px 0;color:#8b7348">${escapeHtml(
           key
-        )}</td><td style="padding:8px 0;color:#2e2c29">${escapeHtml(
+        )}</td><td style="padding:8px 0;color:#0b0b0b">${escapeHtml(
           value
         )}</td></tr>`
     )
     .join("");
 
   const html = `
-    <div style="margin:0;padding:32px;background:#f1e7d5;font-family:Arial,sans-serif;color:#2e2c29">
-      <div style="max-width:680px;margin:0 auto;padding:36px;background:#fffaf2;border-top:8px solid #93a896">
-        <p style="margin:0 0 12px;color:#989282;font-size:12px;letter-spacing:2px;text-transform:uppercase">Boetto Propiedades</p>
+    <div style="margin:0;padding:32px;background:#f4f4f2;font-family:Arial,sans-serif;color:#0b0b0b">
+      <div style="max-width:680px;margin:0 auto;padding:36px;background:#ffffff;border-top:8px solid #c5a05c">
+        <p style="margin:0 0 12px;color:#8b7348;font-size:12px;letter-spacing:2px;text-transform:uppercase">Boetto Propiedades</p>
         <h1 style="margin:0 0 28px;font-family:Georgia,serif;font-size:32px;font-weight:400">${escapeHtml(
           label
         )} #${payload.id}</h1>
         <table style="width:100%;border-collapse:collapse">${rows}</table>
-        <div style="margin-top:28px;padding:24px;border-left:5px solid #d4aa87;background:#f1e7d5">
-          <p style="margin:0 0 10px;color:#989282;font-size:12px;letter-spacing:1.5px;text-transform:uppercase">Mensaje</p>
+        <div style="margin-top:28px;padding:24px;border-left:5px solid #c5a05c;background:#f4f4f2">
+          <p style="margin:0 0 10px;color:#8b7348;font-size:12px;letter-spacing:1.5px;text-transform:uppercase">Mensaje</p>
           <p style="margin:0;line-height:1.7;white-space:pre-wrap">${escapeHtml(
             payload.message || "Sin mensaje adicional."
           )}</p>
         </div>
-        <p style="margin:28px 0 0;color:#989282;font-size:12px">Respondé este correo para contactar directamente a ${escapeHtml(
+        <p style="margin:28px 0 0;color:#70706d;font-size:12px">Respondé este correo para contactar directamente a ${escapeHtml(
           payload.name
         )}.</p>
       </div>
@@ -133,4 +133,3 @@ export async function sendInquiryEmail(payload: InquiryEmailPayload) {
     html,
   });
 }
-

@@ -6,11 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "supabase:check": "node scripts/check-supabase.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
     "@prisma/client": "^5.22.0",
+    "@supabase/supabase-js": "2.90.0",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.0.0",
     "next": "16.2.9",

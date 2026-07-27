@@ -95,8 +95,7 @@ export default function ContactoPage() {
               <div>
                 <h3 className="text-lg font-serif font-medium text-brand-dark mb-4">Horarios de atención</h3>
                 <div className="space-y-2 text-sm text-brand-dark/60">
-                  <p>Lunes a Viernes: 9:00 - 18:00</p>
-                  <p>Sábados: 9:00 - 13:00</p>
+                  <p>{COMPANY_INFO.hours}</p>
                 </div>
               </div>
 

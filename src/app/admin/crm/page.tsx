@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatPrice } from "@/lib/utils";
 
 interface Contact {
   id: string | number;
@@ -12,6 +11,17 @@ interface Contact {
   interest: string;
   notes: string;
   createdAt: string;
+}
+
+interface InquiryContact {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string | null;
+  type: string;
+  message?: string | null;
+  createdAt: string;
+  property?: { title: string } | null;
 }
 
 export default function AdminCRMPage() {
@@ -33,7 +43,7 @@ export default function AdminCRMPage() {
     // We load inquiries from database as base contacts, and add some realistic mock clients
     fetch("/api/consultas")
       .then((r) => r.json())
-      .then((data: any[]) => {
+      .then((data: InquiryContact[]) => {
         const dbContacts: Contact[] = data.map((inq) => ({
           id: `inq-${inq.id}`,
           name: inq.name,

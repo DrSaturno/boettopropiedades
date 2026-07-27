@@ -35,9 +35,9 @@ export default function Footer() {
         <div>
           <p className="footer-label">Visitanos</p>
           <p>
-            Capital Federal
+            {COMPANY_INFO.address}
             <br />
-            Buenos Aires · Argentina
+            {COMPANY_INFO.hours}
           </p>
         </div>
         <div>

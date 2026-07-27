@@ -51,12 +51,54 @@ const heroChapters = [
 ];
 
 const locationOptions = [
-  { place: "Palermo", context: "Capital Federal" },
+  { place: "Agronomía", context: "Capital Federal" },
+  { place: "Almagro", context: "Capital Federal" },
+  { place: "Balvanera", context: "Capital Federal" },
+  { place: "Barracas", context: "Capital Federal" },
   { place: "Belgrano", context: "Capital Federal" },
-  { place: "Recoleta", context: "Capital Federal" },
+  { place: "Boedo", context: "Capital Federal" },
+  { place: "Caballito", context: "Capital Federal" },
+  { place: "Chacarita", context: "Capital Federal" },
+  { place: "Coghlan", context: "Capital Federal" },
+  { place: "Colegiales", context: "Capital Federal" },
+  { place: "Constitución", context: "Capital Federal" },
+  { place: "Flores", context: "Capital Federal" },
+  { place: "Floresta", context: "Capital Federal" },
+  { place: "La Boca", context: "Capital Federal" },
+  { place: "La Paternal", context: "Capital Federal" },
+  { place: "Liniers", context: "Capital Federal" },
+  { place: "Mataderos", context: "Capital Federal" },
+  { place: "Monserrat", context: "Capital Federal" },
+  { place: "Monte Castro", context: "Capital Federal" },
+  { place: "Nueva Pompeya", context: "Capital Federal" },
   { place: "Núñez", context: "Capital Federal" },
-  { place: "Villa Urquiza", context: "Capital Federal" },
+  { place: "Palermo", context: "Capital Federal" },
+  { place: "Parque Avellaneda", context: "Capital Federal" },
+  { place: "Parque Chacabuco", context: "Capital Federal" },
+  { place: "Parque Chas", context: "Capital Federal" },
+  { place: "Parque Patricios", context: "Capital Federal" },
   { place: "Puerto Madero", context: "Capital Federal" },
+  { place: "Recoleta", context: "Capital Federal" },
+  { place: "Retiro", context: "Capital Federal" },
+  { place: "Saavedra", context: "Capital Federal" },
+  { place: "San Cristóbal", context: "Capital Federal" },
+  { place: "San Nicolás", context: "Capital Federal" },
+  { place: "San Telmo", context: "Capital Federal" },
+  { place: "Vélez Sarsfield", context: "Capital Federal" },
+  { place: "Versalles", context: "Capital Federal" },
+  { place: "Villa Crespo", context: "Capital Federal" },
+  { place: "Villa del Parque", context: "Capital Federal" },
+  { place: "Villa Devoto", context: "Capital Federal" },
+  { place: "Villa General Mitre", context: "Capital Federal" },
+  { place: "Villa Lugano", context: "Capital Federal" },
+  { place: "Villa Luro", context: "Capital Federal" },
+  { place: "Villa Ortúzar", context: "Capital Federal" },
+  { place: "Villa Pueyrredón", context: "Capital Federal" },
+  { place: "Villa Real", context: "Capital Federal" },
+  { place: "Villa Riachuelo", context: "Capital Federal" },
+  { place: "Villa Santa Rita", context: "Capital Federal" },
+  { place: "Villa Soldati", context: "Capital Federal" },
+  { place: "Villa Urquiza", context: "Capital Federal" },
 ];
 
 const propertyTypes = [
@@ -341,7 +383,7 @@ export default function HomeExperience() {
 
                         {locationOpen && (
                           <div className="hero-search__suggestions" role="listbox">
-                            {filteredLocations.slice(0, 5).map((location) => (
+                            {filteredLocations.map((location) => (
                               <button
                                 key={`${location.place}-${location.context}`}
                                 type="button"

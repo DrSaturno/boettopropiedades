@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, formatArea, parseJsonField, getWhatsAppUrl, getPropertyWhatsAppMessage } from "@/lib/utils";
@@ -60,7 +61,7 @@ export default async function PropertyDetailPage({ params }: Props) {
       <section className="py-8 bg-brand-cream">
         <div className="container-wide">
           <div className="flex items-center gap-2 text-sm text-brand-medium-gray mb-2">
-            <a href="/propiedades" className="hover:text-brand-sage transition-colors">Propiedades</a>
+            <Link href="/propiedades" className="hover:text-brand-sage transition-colors">Propiedades</Link>
             <span>/</span>
             <span className="text-brand-dark">{property.title}</span>
           </div>

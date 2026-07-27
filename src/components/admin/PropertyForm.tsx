@@ -40,8 +40,8 @@ interface Props {
 
 const emptyForm: PropertyFormData = {
   title: "", operation: "venta", propertyType: "casa", status: "draft", featured: false,
-  price: "", currency: "USD", expenses: "", address: "", neighborhood: "", city: "Córdoba",
-  province: "Córdoba", description: "", totalArea: "", coveredArea: "", rooms: "", bedrooms: "",
+  price: "", currency: "USD", expenses: "", address: "", neighborhood: "", city: "Capital Federal",
+  province: "Ciudad Autónoma de Buenos Aires", description: "", totalArea: "", coveredArea: "", rooms: "", bedrooms: "",
   bathrooms: "", garages: "", age: "", amenities: [], images: [], videoUrl: "", externalUrl: "",
   externalSource: "manual",
 };
@@ -51,6 +51,8 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
   const [form, setForm] = useState<PropertyFormData>({ ...emptyForm, ...initialData });
   const [saving, setSaving] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   function update<K extends keyof PropertyFormData>(key: K, value: PropertyFormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -64,6 +66,42 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
 
   function removeImage(index: number) {
     update("images", form.images.filter((_, i) => i !== index));
+  }
+
+  async function uploadImages(files: FileList | null) {
+    if (!files?.length) return;
+
+    setUploadingImages(true);
+    setUploadError("");
+
+    try {
+      const uploads = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const payload = new FormData();
+          payload.append("file", file);
+
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            body: payload,
+          });
+          const result = await response.json();
+
+          if (!response.ok || !result.url) {
+            throw new Error(result.error || "No se pudo subir la imagen");
+          }
+
+          return result.url as string;
+        })
+      );
+
+      update("images", [...form.images, ...uploads]);
+    } catch (error) {
+      setUploadError(
+        error instanceof Error ? error.message : "No se pudieron subir las imágenes"
+      );
+    } finally {
+      setUploadingImages(false);
+    }
   }
 
   function toggleAmenity(amenity: string) {
@@ -209,6 +247,29 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
 
       <div className="bg-brand-surface border border-brand-warm-gray/50 p-6">
         <h2 className="text-lg font-serif font-medium text-brand-dark mb-4">Imágenes</h2>
+        <label className="block mb-4">
+          <span className={labelClass}>Subir desde el dispositivo</span>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/avif"
+            multiple
+            disabled={uploadingImages}
+            onChange={(event) => {
+              void uploadImages(event.target.files);
+              event.currentTarget.value = "";
+            }}
+            className={`${inputClass} file:mr-4 file:border-0 file:bg-brand-dark file:px-4 file:py-2 file:text-xs file:font-medium file:text-white`}
+          />
+          <span className="mt-2 block text-xs text-brand-medium-gray">
+            JPG, PNG, WebP o AVIF. Máximo 10 MB por imagen.
+          </span>
+        </label>
+        {uploadingImages && (
+          <p className="mb-4 text-sm text-brand-medium-gray">Subiendo imágenes...</p>
+        )}
+        {uploadError && (
+          <p className="mb-4 text-sm text-red-600">{uploadError}</p>
+        )}
         <div className="flex gap-2 mb-4">
           <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="URL de la imagen" className={inputClass} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImage(); } }} />
           <button type="button" onClick={addImage} className="px-4 py-2 bg-brand-sage text-white text-sm shrink-0 hover:bg-brand-sage-dark transition-colors">Agregar</button>

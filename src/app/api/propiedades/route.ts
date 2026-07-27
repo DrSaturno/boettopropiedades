@@ -34,7 +34,7 @@ export async function POST(request: Request) {
         address: body.address || null,
         neighborhood: body.neighborhood || null,
         city: body.city || null,
-        province: body.province || "Córdoba",
+        province: body.province || "Ciudad Autónoma de Buenos Aires",
         description: body.description || null,
         totalArea: body.totalArea ? Number(body.totalArea) : null,
         coveredArea: body.coveredArea ? Number(body.coveredArea) : null,

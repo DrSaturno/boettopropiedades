@@ -192,7 +192,7 @@ function scrapeMercadoLibre(html: string, url: string): ScrapedData {
   return data;
 }
 
-function scrapeGeneric(html: string, url: string): ScrapedData {
+function scrapeGeneric(html: string): ScrapedData {
   const $ = cheerio.load(html);
   const data = emptyResult("otro");
 
@@ -276,7 +276,7 @@ export async function scrapeProperty(url: string): Promise<ScrapedData> {
       case "zonaprop": data = scrapeZonaprop(html, url); break;
       case "argenprop": data = scrapeArgenprop(html, url); break;
       case "mercadolibre": data = scrapeMercadoLibre(html, url); break;
-      default: data = scrapeGeneric(html, url);
+      default: data = scrapeGeneric(html);
     }
 
     data.images = [...new Set(data.images)].slice(0, 30);

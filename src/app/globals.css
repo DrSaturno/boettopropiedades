@@ -1,28 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --brand-charcoal: #2e2c29;
-  --brand-sage-official: #93a896;
-  --brand-taupe: #989282;
-  --brand-warm: #d4aa87;
-  --brand-cream-official: #f1e7d5;
+  --brand-charcoal: #0b0b0b;
+  --brand-sage-official: #c5a05c;
+  --brand-taupe: #9d8250;
+  --brand-warm: #c5a05c;
+  --brand-cream-official: #ffffff;
   --ink: var(--brand-charcoal);
-  --ink-soft: #403d39;
+  --ink-soft: #242424;
   --paper: var(--brand-cream-official);
-  --paper-deep: #e8dcc8;
-  --stone: var(--brand-taupe);
+  --paper-deep: #f4f4f2;
+  --stone: #b8b8b5;
   --olive: var(--brand-sage-official);
   --oxblood: var(--brand-warm);
-  --line: rgba(46, 44, 41, 0.2);
+  --line: rgba(11, 11, 11, 0.18);
   --brand-dark: var(--ink);
   --brand-accent-dark: var(--ink-soft);
   --brand-sage: var(--olive);
-  --brand-sage-light: #b9c7bb;
+  --brand-sage-light: #e2c990;
   --brand-sage-dark: var(--brand-charcoal);
   --brand-cream: var(--paper);
-  --brand-warm-gray: var(--stone);
-  --brand-medium-gray: var(--brand-taupe);
-  --brand-surface: #f8f1e5;
+  --brand-warm-gray: #c8c8c5;
+  --brand-medium-gray: #70706d;
+  --brand-surface: #ffffff;
   --background: var(--paper);
   --foreground: var(--ink);
 }
@@ -91,7 +91,7 @@ button {
 
 ::selection {
   background: var(--brand-sage-official);
-  color: var(--brand-charcoal);
+  color: #fff;
 }
 
 :focus-visible {
@@ -254,8 +254,8 @@ button {
 .site-header.is-scrolled {
   height: 74px;
   border-top-color: var(--brand-warm);
-  border-bottom-color: rgba(46, 44, 41, 0.12);
-  background: rgba(241, 231, 213, 0.94);
+  border-bottom-color: rgba(11, 11, 11, 0.12);
+  background: rgba(255, 255, 255, 0.94);
   color: var(--ink);
   backdrop-filter: blur(18px) saturate(120%);
   box-shadow: 0 12px 36px rgba(23, 24, 21, 0.08);
@@ -363,7 +363,7 @@ button {
   padding: 10px;
   border: 1px solid rgba(23, 24, 21, 0.1);
   border-radius: 16px;
-  background: #fffdf8;
+  background: #fff;
   opacity: 0;
   pointer-events: none;
   box-shadow: 0 18px 42px rgba(23, 24, 21, 0.12);
@@ -381,7 +381,7 @@ button {
 }
 
 .site-nav__submenu a:hover {
-  background: #f0ede5;
+  background: rgba(197, 160, 92, 0.14);
   color: var(--ink);
 }
 
@@ -1161,7 +1161,7 @@ button {
   border: 5px solid var(--oxblood);
   border-radius: 50%;
   background: var(--paper);
-  box-shadow: 0 0 0 6px rgba(212, 170, 135, 0.2);
+  box-shadow: 0 0 0 6px rgba(197, 160, 92, 0.2);
   transition: top 500ms ease, left 500ms ease;
 }
 
@@ -2287,8 +2287,8 @@ textarea:-webkit-autofill {
 
 .agency-home {
   background:
-    radial-gradient(circle at top, rgba(147, 168, 150, 0.22), transparent 30%),
-    linear-gradient(180deg, var(--brand-cream-official) 0%, #e8dcc8 100%);
+    radial-gradient(circle at top, rgba(197, 160, 92, 0.14), transparent 30%),
+    linear-gradient(180deg, var(--brand-cream-official) 0%, #f4f4f2 100%);
 }
 
 .agency-section {
@@ -2299,7 +2299,7 @@ textarea:-webkit-autofill {
   --video-progress: 0;
   position: relative;
   min-height: 400svh;
-  background: #141512;
+  background: var(--brand-charcoal);
   color: #fff;
 }
 
@@ -2448,7 +2448,7 @@ textarea:-webkit-autofill {
 .scroll-hero__chapter h2 em {
   display: block;
   margin-top: 0.06em;
-  color: #d5cbbb;
+  color: rgba(255, 255, 255, 0.82);
   font-style: italic;
   font-weight: 400;
 }
@@ -2527,7 +2527,7 @@ textarea:-webkit-autofill {
 .hero-search__modes button.is-active {
   border-color: var(--brand-sage-official);
   background: var(--brand-sage-official);
-  color: var(--brand-charcoal);
+  color: #fff;
 }
 
 .hero-search__bar {
@@ -2537,7 +2537,7 @@ textarea:-webkit-autofill {
   grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.9fr) 92px;
   border: 1px solid rgba(255, 255, 255, 0.56);
   border-radius: 24px;
-  background: rgba(241, 231, 213, 0.96);
+  background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 26px 70px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px) saturate(120%);
 }
@@ -2582,12 +2582,27 @@ textarea:-webkit-autofill {
   top: calc(100% + 10px);
   right: 0;
   left: 0;
-  overflow: hidden;
+  max-height: min(340px, 46vh);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 8px;
   border: 1px solid rgba(46, 44, 41, 0.12);
   border-radius: 18px;
   background: var(--brand-cream-official);
   box-shadow: 0 24px 56px rgba(12, 13, 11, 0.22);
+  scrollbar-color: var(--brand-warm) transparent;
+  scrollbar-width: thin;
+}
+
+.hero-search__suggestions::-webkit-scrollbar {
+  width: 7px;
+}
+
+.hero-search__suggestions::-webkit-scrollbar-thumb {
+  border: 2px solid var(--brand-cream-official);
+  border-radius: 999px;
+  background: var(--brand-warm);
 }
 
 .hero-search__suggestions button {
@@ -2602,7 +2617,7 @@ textarea:-webkit-autofill {
 }
 
 .hero-search__suggestions button:hover {
-  background: rgba(147, 168, 150, 0.22);
+  background: rgba(197, 160, 92, 0.16);
 }
 
 .hero-search__suggestions strong {
@@ -2686,7 +2701,7 @@ textarea:-webkit-autofill {
 }
 
 .hero-search__type-menu label:hover {
-  background: rgba(147, 168, 150, 0.22);
+  background: rgba(197, 160, 92, 0.16);
 }
 
 .hero-search__type-menu input {
@@ -2712,7 +2727,7 @@ textarea:-webkit-autofill {
 
 .hero-search__submit:hover {
   background: var(--brand-sage-official);
-  color: var(--brand-charcoal);
+  color: #fff;
 }
 
 .hero-search__submit .search-icon {
@@ -2773,7 +2788,7 @@ textarea:-webkit-autofill {
   height: 100%;
   transform: scaleX(max(var(--video-progress), 0.015));
   transform-origin: 0 50%;
-  background: linear-gradient(90deg, #f3efe6 0%, #b9a38e 100%);
+  background: linear-gradient(90deg, #fff 0%, var(--brand-warm) 100%);
 }
 
 .agency-section--search {
@@ -2919,8 +2934,8 @@ textarea:-webkit-autofill {
   display: grid;
   min-width: 0;
   grid-template-rows: auto 1fr;
-  border: 1px solid rgba(46, 44, 41, 0.14);
-  background: #f8f1e5;
+  border: 1px solid rgba(11, 11, 11, 0.14);
+  background: #fff;
 }
 
 .service-card__media {
@@ -2967,7 +2982,7 @@ textarea:-webkit-autofill {
   margin: 0;
   padding: 30px 28px 32px;
   border-top: 5px solid var(--brand-warm);
-  background: #f8f1e5;
+  background: #fff;
 }
 
 .service-card__copy > .eyebrow {
@@ -3099,8 +3114,8 @@ textarea:-webkit-autofill {
   gap: 40px;
   align-items: end;
   border: 0;
-  background: rgba(241, 231, 213, 0.92);
-  box-shadow: 0 28px 60px rgba(46, 44, 41, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 28px 60px rgba(11, 11, 11, 0.16);
 }
 
 .closing-panel__actions {
@@ -3186,7 +3201,7 @@ textarea:-webkit-autofill {
 .contact-layout__intro > p:not(.eyebrow) {
   max-width: 50ch;
   margin: 0;
-  color: rgba(241, 231, 213, 0.72);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 0.96rem;
   line-height: 1.8;
 }
@@ -3195,7 +3210,7 @@ textarea:-webkit-autofill {
   display: inline-block;
   margin-top: 34px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(212, 170, 135, 0.7);
+  border-bottom: 1px solid rgba(197, 160, 92, 0.7);
   color: var(--brand-warm);
   font-size: 0.78rem;
   letter-spacing: 0.05em;
@@ -3203,8 +3218,8 @@ textarea:-webkit-autofill {
 
 .contact-layout__form {
   padding: clamp(28px, 4vw, 50px);
-  border: 1px solid rgba(241, 231, 213, 0.18);
-  background: rgba(241, 231, 213, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .contact-layout__form-label {
@@ -3217,14 +3232,14 @@ textarea:-webkit-autofill {
 
 .contact-form--editorial .contact-form__field {
   min-height: 54px;
-  border-color: rgba(241, 231, 213, 0.26);
+  border-color: rgba(255, 255, 255, 0.26);
   border-radius: 0;
   background: transparent;
   color: var(--brand-cream-official);
 }
 
 .contact-form--editorial .contact-form__field::placeholder {
-  color: rgba(241, 231, 213, 0.52);
+  color: rgba(255, 255, 255, 0.52);
 }
 
 .contact-form--editorial .contact-form__field:focus {
@@ -3239,7 +3254,7 @@ textarea:-webkit-autofill {
   min-height: 56px;
   border: 1px solid var(--brand-warm);
   background: var(--brand-warm);
-  color: var(--brand-charcoal);
+  color: #fff;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -3247,14 +3262,14 @@ textarea:-webkit-autofill {
 }
 
 .contact-form--editorial .contact-form__submit:hover {
-  border-color: var(--brand-sage-official);
-  background: var(--brand-sage-official);
+  border-color: #fff;
+  background: #fff;
   color: var(--brand-charcoal);
 }
 
 .contact-form__success--editorial {
-  border-color: rgba(147, 168, 150, 0.5);
-  background: rgba(147, 168, 150, 0.12);
+  border-color: rgba(197, 160, 92, 0.5);
+  background: rgba(197, 160, 92, 0.12);
   color: var(--brand-cream-official);
 }
 
@@ -3519,10 +3534,7 @@ textarea:-webkit-autofill {
   }
 
   .scroll-hero__meta {
-    top: 90px;
-    right: 20px;
-    justify-content: center;
-    text-align: center;
+    display: none;
   }
 
   .scroll-hero__chapter {
