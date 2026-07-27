@@ -1604,12 +1604,14 @@ button {
   padding: 76px 3.25vw 28px;
   background: var(--ink);
   color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .site-footer__top {
   display: grid;
   padding-bottom: 55px;
-  grid-template-columns: 1.6fr 1fr 1fr;
+  grid-template-columns: 1.35fr 1.4fr 1fr 0.6fr;
+  gap: 60px;
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.17);
 }
@@ -1618,6 +1620,7 @@ button {
   display: flex;
   width: fit-content;
   align-items: center;
+  grid-column: 1;
 }
 
 .site-footer__top img {
@@ -1635,7 +1638,12 @@ button {
   line-height: 1.45;
 }
 
+.site-footer__top p {
+  grid-column: 2;
+}
+
 .site-footer__top > a:last-child {
+  grid-column: 4;
   justify-self: end;
 }
 
