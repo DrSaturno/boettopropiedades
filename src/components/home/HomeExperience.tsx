@@ -463,7 +463,7 @@ export default function HomeExperience() {
         className="agency-section--contact"
         data-header-boundary
       >
-        <div className="closing-panel w-full" data-reveal>
+        <div className="section-shell closing-panel" data-reveal>
           <div className="closing-panel__copy">
             <div>
               <p className="eyebrow">Proxima conversacion</p>
