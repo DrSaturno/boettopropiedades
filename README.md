@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Boetto Web
 
-## Getting Started
+Sitio web de Boetto Propiedades construido con Next.js, con una home editorial premium orientada a consulta, contexto de marca y conversion.
 
-First, run the development server:
+## Estado actual
+
+Al 27 de julio de 2026 el proyecto incluye:
+
+1. Home principal con hero de video sujeto a scroll.
+2. Buscador integrado como ultimo capitulo del hero.
+3. Navegacion publica para comprar, alquilar, vender, conocer el estudio y contactar.
+4. Paginas publicas de propiedades, tasaciones, nosotros y contacto.
+5. Area admin y APIs internas en desarrollo dentro del mismo repo.
+
+## Stack
+
+1. Next.js 16
+2. React 19
+3. TypeScript
+4. Prisma
+
+## Scripts
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+npm run start
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Estructura principal
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`src/app/`
+Rutas publicas, admin y endpoints internos.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`src/components/`
+Componentes de layout, home, propiedades, formularios y admin.
 
-## Learn More
+`public/`
+Assets de marca, imagenes y video.
 
-To learn more about Next.js, take a look at the following resources:
+`prisma/`
+Schema y seed local.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`docs/sdd/`
+Normas y contexto estable para Spec-Driven Development.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`specs/`
+Iniciativas documentadas con `spec.md`, `plan.md` y `tasks.md`.
 
-## Deploy on Vercel
+## Flujo SDD
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Este repo deja de tratar la documentacion como algo accesorio. A partir de este punto:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Cada cambio importante arranca con una spec.
+2. La spec baja a un plan tecnico.
+3. El plan se convierte en tareas verificables.
+4. La implementacion y la validacion quedan ancladas a esa iniciativa.
+
+Puntos de entrada:
+
+- `docs/sdd/README.md`
+- `specs/README.md`
+- `specs/2026-07-27-home-experience/`
+
+## Notas de validacion
+
+1. El build de produccion debe seguir pasando antes de cerrar cambios importantes.
+2. El repo tiene deuda de lint historica fuera de la home; por eso conviene validar con foco cuando el cambio no toca esas areas.

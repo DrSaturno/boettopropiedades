@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id             Int       @id @default(autoincrement())
+  title          String
+  slug           String    @unique
+  operation      String
+  propertyType   String
+  status         String    @default("published")
+  featured       Boolean   @default(false)
+  price          Float?
+  currency       String    @default("USD")
+  expenses       Float?
+  address        String?
+  neighborhood   String?
+  city           String?
+  province       String    @default("Córdoba")
+  description    String?
+  totalArea      Float?
+  coveredArea    Float?
+  rooms          Int?
+  bedrooms       Int?
+  bathrooms      Int?
+  garages        Int?
+  age            Int?
+  amenities      String?
+  images         String?
+  videoUrl       String?
+  externalUrl    String?
+  externalSource String?
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  inquiries      Inquiry[]
+}
+
+model Inquiry {
+  id         Int       @id @default(autoincrement())
+  name       String
+  phone      String?
+  email      String
+  message    String?
+  type       String    @default("contact")
+  propertyId Int?
+  property   Property? @relation(fields: [propertyId], references: [id])
+  read       Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  name     String?
+}
