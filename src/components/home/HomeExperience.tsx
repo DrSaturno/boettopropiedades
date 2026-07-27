@@ -320,14 +320,6 @@ export default function HomeExperience() {
           <div className="scroll-hero__shade" />
           <div className="scroll-hero__grain" />
 
-          <div className="scroll-hero__meta">
-            <span>Boetto Propiedades</span>
-            <span>Una busqueda guiada por criterio</span>
-          </div>
-
-          <p className="scroll-hero__vertical">
-            Capital Federal · Hogares con contexto · Desde 1987
-          </p>
 
           <div className="scroll-hero__chapters">
             {heroChapters.map((chapter, index) => (
@@ -443,19 +435,7 @@ export default function HomeExperience() {
             ))}
           </div>
 
-          <div className="scroll-hero__navigation" aria-label="Progreso del recorrido">
-            <span aria-hidden="true">
-              0{activeChapter + 1}
-              <i>/</i>
-              0{heroChapters.length}
-            </span>
-            <div className="scroll-hero__timeline" aria-hidden="true">
-              <div>
-                <i />
-              </div>
-            </div>
-            <p>Desliza para recorrer</p>
-          </div>
+
         </div>
       </section>
 
