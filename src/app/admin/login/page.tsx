@@ -16,18 +16,25 @@ export default function AdminLoginPage() {
     setError("");
 
     const form = new FormData(e.currentTarget);
-    const result = await signIn("credentials", {
-      email: form.get("email"),
-      password: form.get("password"),
-      redirect: false,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email: form.get("email"),
+        password: form.get("password"),
+        redirect: false,
+      });
 
-    if (result?.error) {
-      setError("Credenciales incorrectas");
-      setLoading(false);
-    } else {
+      if (!result?.ok || result.error) {
+        setError("Credenciales incorrectas");
+        return;
+      }
+
       router.push("/admin");
       router.refresh();
+    } catch (error) {
+      console.error("No se pudo iniciar sesión", error);
+      setError("No se pudo conectar con el servidor. Intentá nuevamente.");
+    } finally {
+      setLoading(false);
     }
   }
 

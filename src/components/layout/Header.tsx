@@ -11,17 +11,10 @@ const links = [
   { href: "/tasaciones", label: "Vender" },
 ];
 
-const moreLinks = [
-  { href: "/propiedades", label: "Propiedades" },
-  { href: "/nosotros", label: "Nuestro estudio" },
-  { href: "/contacto", label: "Contacto" },
-];
-
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
     if (pathname !== "/") return;
@@ -87,38 +80,12 @@ export default function Header() {
       <nav
         className={`site-nav ${open ? "is-open" : ""}`}
         aria-label="Navegación principal"
-        onMouseLeave={() => setMoreOpen(false)}
       >
         {links.map((link) => (
           <Link href={link.href} key={link.href} onClick={() => setOpen(false)}>
             {link.label}
           </Link>
         ))}
-
-        <div className={`site-nav__more ${moreOpen ? "is-open" : ""}`}>
-          <button
-            type="button"
-            aria-expanded={moreOpen}
-            onClick={() => setMoreOpen((current) => !current)}
-          >
-            Más
-            <i aria-hidden="true" />
-          </button>
-          <div className="site-nav__submenu">
-            {moreLinks.map((link) => (
-              <Link
-                href={link.href}
-                key={link.href}
-                onClick={() => {
-                  setMoreOpen(false);
-                  setOpen(false);
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </div>
       </nav>
 
       <Link href="/propiedades" className="site-header__inquiry">
