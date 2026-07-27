@@ -1679,6 +1679,33 @@ button {
   color: #fff;
 }
 
+.site-footer__socials {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.site-footer__socials a {
+  display: inline-flex;
+  width: auto;
+  margin: 0;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.site-footer__socials svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.site-footer__socials span {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .site-footer__bottom {
   display: flex;
   padding-top: 22px;
@@ -2904,8 +2931,8 @@ textarea:-webkit-autofill {
 
 .agency-section--contact {
   padding: 94px 0;
-  border-top: 8px solid var(--brand-warm);
-  background: var(--brand-sage-official);
+  border-top: 0;
+  background: var(--brand-cream-official);
 }
 
 .agency-section--services {
@@ -3015,7 +3042,7 @@ textarea:-webkit-autofill {
 .closing-panel {
   padding: 34px;
   border: 1px solid rgba(23, 24, 21, 0.1);
-  background: rgba(255, 252, 246, 0.78);
+  background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 26px 54px rgba(26, 24, 18, 0.06);
 }
 
@@ -3110,12 +3137,17 @@ textarea:-webkit-autofill {
 
 .closing-panel {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 40px;
-  align-items: end;
-  border: 0;
-  background: rgba(255, 255, 255, 0.96);
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 34px;
+  align-items: stretch;
+  border-color: rgba(11, 11, 11, 0.1);
   box-shadow: 0 28px 60px rgba(11, 11, 11, 0.16);
+}
+
+.closing-panel__copy {
+  display: grid;
+  gap: 28px;
+  align-content: space-between;
 }
 
 .closing-panel__actions {
@@ -3123,6 +3155,22 @@ textarea:-webkit-autofill {
   margin-top: 34px;
   align-items: center;
   gap: 24px;
+}
+
+.closing-panel__visual {
+  min-width: 0;
+}
+
+.closing-panel__image {
+  position: relative;
+  min-height: 100%;
+  overflow: hidden;
+  aspect-ratio: 4 / 4.6;
+  background: var(--paper-deep);
+}
+
+.closing-panel__image img {
+  object-fit: cover;
 }
 
 .closing-panel__primary {
@@ -3453,7 +3501,7 @@ textarea:-webkit-autofill {
 
   .agency-search__intro,
   .agency-grid__headline,
-  .closing-panel > div:first-child,
+  .closing-panel__copy,
   .closing-panel__body,
   .contact-layout__intro {
     margin-inline: auto;
@@ -3506,6 +3554,10 @@ textarea:-webkit-autofill {
   .market-panel,
   .closing-panel {
     padding: 24px;
+  }
+
+  .closing-panel__image {
+    aspect-ratio: 16 / 11;
   }
 
   .contact-layout__form {
@@ -3697,6 +3749,10 @@ textarea:-webkit-autofill {
 
   .closing-panel__primary {
     justify-content: space-between;
+  }
+
+  .site-footer__socials {
+    justify-content: center;
   }
 
   .closing-panel__actions > a:last-child {

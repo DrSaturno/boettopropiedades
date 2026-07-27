@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import SiteChrome from "@/components/layout/SiteChrome";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -19,11 +18,11 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "Boetto Propiedades | Curaduría inmobiliaria en Capital Federal",
+    default: "Boetto Propiedades | Curaduria inmobiliaria en Capital Federal",
     template: "%s | Boetto Propiedades",
   },
   description:
-    "Propiedades con arquitectura, contexto y carácter. Venta, alquiler y tasación en Capital Federal.",
+    "Propiedades con arquitectura, contexto y caracter. Venta, alquiler y tasacion en Capital Federal.",
   keywords: [
     "inmobiliaria",
     "propiedades",
@@ -38,8 +37,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_AR",
     siteName: "Boetto Propiedades",
-    title: "Boetto Propiedades | Curaduría inmobiliaria en Capital Federal",
-    description: "Propiedades con arquitectura, contexto y carácter en Capital Federal.",
+    title: "Boetto Propiedades | Curaduria inmobiliaria en Capital Federal",
+    description: "Propiedades con arquitectura, contexto y caracter en Capital Federal.",
   },
 };
 
@@ -54,9 +53,7 @@ export default function RootLayout({
       className={`${dmSans.variable} ${playfair.variable} antialiased`}
     >
       <body>
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );
