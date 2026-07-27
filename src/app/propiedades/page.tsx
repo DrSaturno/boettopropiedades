@@ -16,6 +16,20 @@ interface Props {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
+async function getPublishedProperties(where: Prisma.PropertyWhereInput) {
+  try {
+    const properties = await prisma.property.findMany({
+      where,
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    });
+
+    return { properties, unavailable: false };
+  } catch (error) {
+    console.error("[properties] Unable to load the property catalog", error);
+    return { properties: [], unavailable: true };
+  }
+}
+
 export default async function PropertiesPage({ searchParams }: Props) {
   const params = await searchParams;
 
@@ -38,10 +52,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
   }
   if (params.bedrooms) where.bedrooms = { gte: Number(params.bedrooms) };
 
-  const properties = await prisma.property.findMany({
-    where,
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-  });
+  const { properties, unavailable } = await getPublishedProperties(where);
 
   const mapped = properties.map((p) => ({
     ...p,
@@ -69,10 +80,29 @@ export default async function PropertiesPage({ searchParams }: Props) {
           <Suspense fallback={null}>
             <PropertyFilters />
           </Suspense>
-          <p className="text-sm text-brand-medium-gray mb-6">
-            {mapped.length} propiedad{mapped.length !== 1 ? "es" : ""} encontrada{mapped.length !== 1 ? "s" : ""}
-          </p>
-          <PropertyGrid properties={mapped} />
+          {unavailable ? (
+            <div
+              className="border border-brand-warm-gray/50 bg-brand-surface p-8 text-center"
+              role="status"
+            >
+              <h2 className="mb-3 font-serif text-2xl text-brand-dark">
+                Estamos actualizando el catálogo
+              </h2>
+              <p className="mx-auto max-w-xl text-sm leading-relaxed text-brand-dark/60">
+                Las propiedades van a volver a estar disponibles en breve. Mientras
+                tanto, podés escribirnos desde la sección de contacto para contarnos
+                qué estás buscando.
+              </p>
+            </div>
+          ) : (
+            <>
+              <p className="mb-6 text-sm text-brand-medium-gray">
+                {mapped.length} propiedad{mapped.length !== 1 ? "es" : ""} encontrada
+                {mapped.length !== 1 ? "s" : ""}
+              </p>
+              <PropertyGrid properties={mapped} />
+            </>
+          )}
         </div>
       </section>
     </>
