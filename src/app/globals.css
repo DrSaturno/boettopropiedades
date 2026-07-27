@@ -3137,12 +3137,6 @@ textarea:-webkit-autofill {
 }
 
 .closing-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
-  gap: 34px;
-  align-items: stretch;
-  border-color: rgba(11, 11, 11, 0.1);
-.closing-panel {
   position: relative;
   display: flex;
   flex-direction: column;
