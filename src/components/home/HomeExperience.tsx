@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { COMPANY_INFO } from "@/lib/constants";
 
 const heroChapters = [
   {
@@ -33,17 +34,7 @@ const heroChapters = [
         <em>antes que los metros.</em>
       </>
     ),
-    text: "Orientación, escala, accesos y valor futuro convierten una dirección en una decisión bien informada.",
-  },
-  {
-    kicker: "Luego · La selección",
-    title: (
-      <>
-        Pocas opciones.
-        <em>Más criterio.</em>
-      </>
-    ),
-    text: "Una selección breve y personal permite mirar mejor, comparar con calma y reconocer la propiedad correcta.",
+    text: "Orientación, accesos, arquitectura y valor futuro nos permiten seleccionar menos opciones y compararlas con más criterio.",
   },
   {
     kicker: "Finalmente · Tu búsqueda",
@@ -59,12 +50,12 @@ const heroChapters = [
 ];
 
 const locationOptions = [
-  { place: "Zona Norte", context: "Córdoba Capital" },
-  { place: "Nueva Córdoba", context: "Córdoba Capital" },
-  { place: "Villa Allende", context: "Sierras Chicas, Córdoba" },
-  { place: "La Rufina", context: "Zona Norte, Córdoba" },
-  { place: "Manantiales", context: "Zona Sur, Córdoba" },
-  { place: "Cerro de las Rosas", context: "Zona Norte, Córdoba" },
+  { place: "Palermo", context: "Capital Federal" },
+  { place: "Belgrano", context: "Capital Federal" },
+  { place: "Recoleta", context: "Capital Federal" },
+  { place: "Núñez", context: "Capital Federal" },
+  { place: "Villa Urquiza", context: "Capital Federal" },
+  { place: "Puerto Madero", context: "Capital Federal" },
 ];
 
 const propertyTypes = [
@@ -78,44 +69,26 @@ const propertyTypes = [
 
 const services = [
   {
+    label: "Acompañamiento",
     title: "Búsqueda guiada",
-    text: "Acompañamos decisiones residenciales con criterio de barrio, tipología, luz, expansión y valor futuro.",
+    text: "Escuchamos primero. Después traducimos prioridades reales en una búsqueda breve, clara y acompañada.",
+    image: "/images/boetto-team.png",
+    alt: "Equipo de Boetto Propiedades en una reunión de trabajo",
   },
   {
+    label: "Estrategia",
     title: "Tasaciones precisas",
-    text: "Lectura comparativa, sensibilidad comercial y estrategia de salida para propietarios que quieren posicionar bien su activo.",
+    text: "Combinamos lectura comparativa, sensibilidad comercial y conocimiento de Capital Federal para posicionar cada activo.",
+    image: "/images/boetto-courtyard.png",
+    alt: "Arquitectura residencial contemporánea analizada por Boetto Propiedades",
   },
   {
+    label: "Criterio",
     title: "Selección privada",
-    text: "Combinamos propiedades publicadas con oportunidades que circulan de forma reservada y búsquedas a medida.",
+    text: "Sumamos propiedades publicadas, oportunidades reservadas y búsquedas a medida para mostrar solo lo que vale la pena visitar.",
+    image: "/images/boetto-penthouse.png",
+    alt: "Penthouse de arquitectura contemporánea seleccionado por Boetto Propiedades",
   },
-];
-
-const districts = [
-  {
-    name: "Zona Norte",
-    label: "Residencial y verde",
-    stat: "Casas con lote, accesos rapidos y demanda sostenida.",
-    insight: "Ideal para familias que priorizan expansion, privacidad y vida cotidiana mas serena.",
-  },
-  {
-    name: "Nueva Cordoba",
-    label: "Urbano y dinamico",
-    stat: "Movimiento permanente, alquiler temporario y ritmo mas compacto.",
-    insight: "Funciona bien para inversion, primeras compras y perfiles que quieren ciudad a pie.",
-  },
-  {
-    name: "Villa Allende",
-    label: "Paisaje y escala",
-    stat: "Casas con caracter, barrios abiertos y relacion fuerte con el entorno.",
-    insight: "Suele atraer busquedas que valoran diseño, aire libre y una vida menos congestionada.",
-  },
-];
-
-const marketNotes = [
-  "El valor de una propiedad se define tanto por su estado como por la calidad urbana y el desarrollo de su entorno.",
-  "En el segmento premium, orientación, privacidad y arquitectura sostienen mejor el valor a largo plazo.",
-  "Una buena búsqueda compara menos opciones, pero incorpora más información antes de decidir una visita.",
 ];
 
 function ArrowIcon() {
@@ -140,7 +113,6 @@ export default function HomeExperience() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const heroRef = useRef<HTMLElement | null>(null);
   const [operation, setOperation] = useState("venta");
-  const [district, setDistrict] = useState(0);
   const [videoReady, setVideoReady] = useState(false);
   const [activeChapter, setActiveChapter] = useState(0);
   const [locationQuery, setLocationQuery] = useState("");
@@ -273,7 +245,6 @@ export default function HomeExperience() {
     );
   }
 
-  const activeDistrict = districts[district];
   const filteredLocations = locationQuery.trim()
     ? locationOptions.filter(({ place, context }) =>
         `${place} ${context}`
@@ -312,7 +283,7 @@ export default function HomeExperience() {
             <span>Una búsqueda guiada por criterio</span>
           </div>
 
-          <p className="scroll-hero__vertical">Córdoba · Hogares con contexto · Desde 1987</p>
+          <p className="scroll-hero__vertical">Capital Federal · Hogares con contexto · Desde 1987</p>
 
           <div className="scroll-hero__chapters">
             {heroChapters.map((chapter, index) => (
@@ -440,7 +411,10 @@ export default function HomeExperience() {
         </div>
       </section>
 
-      <section className="agency-section agency-section--services">
+      <section
+        className="agency-section agency-section--services"
+        data-header-boundary
+      >
         <div className="section-shell agency-grid">
           <div className="agency-grid__headline" data-reveal>
             <p className="eyebrow">Cómo trabaja el estudio</p>
@@ -448,57 +422,24 @@ export default function HomeExperience() {
           </div>
 
           <div className="service-list">
-            {services.map((service) => (
+            {services.map((service, index) => (
               <article key={service.title} className="service-card" data-reveal>
-                <h3>{service.title}</h3>
-                <p>{service.text}</p>
+                <div className="service-card__media">
+                  <Image
+                    src={service.image}
+                    alt={service.alt}
+                    fill
+                    sizes="(max-width: 900px) 100vw, 33vw"
+                  />
+                  <span aria-hidden="true">0{index + 1}</span>
+                </div>
+                <div className="service-card__copy">
+                  <p className="eyebrow">{service.label}</p>
+                  <h3>{service.title}</h3>
+                  <p>{service.text}</p>
+                </div>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="agency-section agency-section--districts">
-        <div className="section-shell district-layout">
-          <div className="district-panel" data-reveal>
-            <p className="eyebrow">Barrios en foco</p>
-            <h2>Elegir zona sigue siendo la decisión grande.</h2>
-
-            <div className="district-tabs" role="tablist" aria-label="Barrios destacados">
-              {districts.map((item, index) => (
-                <button
-                  key={item.name}
-                  type="button"
-                  className={district === index ? "is-active" : ""}
-                  onClick={() => setDistrict(index)}
-                >
-                  <span>{item.name}</span>
-                  <small>{item.label}</small>
-                </button>
-              ))}
-            </div>
-
-            <div className="district-detail">
-              <strong>{activeDistrict.name}</strong>
-              <p>{activeDistrict.stat}</p>
-              <span>{activeDistrict.insight}</span>
-            </div>
-          </div>
-
-          <div className="market-panel" data-reveal>
-            <p className="eyebrow">Lectura de mercado</p>
-            <div className="market-panel__stack">
-              {marketNotes.map((note, index) => (
-                <article key={note} className="market-note">
-                  <span>0{index + 1}</span>
-                  <p>{note}</p>
-                </article>
-              ))}
-            </div>
-            <blockquote>
-              “La decisión correcta aparece cuando la información y la forma de
-              vivir empiezan a señalar el mismo lugar.”
-            </blockquote>
           </div>
         </div>
       </section>
@@ -506,7 +447,7 @@ export default function HomeExperience() {
       <section className="agency-section agency-section--contact">
         <div className="section-shell closing-panel" data-reveal>
           <div>
-            <p className="eyebrow">Proxima conversacion</p>
+            <p className="eyebrow">Próxima conversación</p>
             <h2>Una búsqueda bien acompañada empieza mucho antes de una visita.</h2>
           </div>
 
@@ -517,12 +458,15 @@ export default function HomeExperience() {
               una búsqueda concreta.
             </p>
             <div className="closing-panel__actions">
-              <Link href="/contacto" className="outline-link">
-                Hablar con el equipo
+              <a
+                href={`mailto:${COMPANY_INFO.email}?subject=Quiero%20coordinar%20una%20próxima%20visita`}
+                className="closing-panel__primary"
+              >
+                Coordinar próxima visita
                 <ArrowIcon />
-              </Link>
-              <a href="mailto:hola@boettopropiedades.com.ar">
-                hola@boettopropiedades.com.ar
+              </a>
+              <a href={`mailto:${COMPANY_INFO.email}`}>
+                {COMPANY_INFO.email}
               </a>
             </div>
           </div>

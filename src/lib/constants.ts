@@ -34,9 +34,9 @@ export const WHATSAPP_MESSAGE =
 export const COMPANY_INFO = {
   name: "Boetto Propiedades",
   phone: "+54 11 4563-2384",
-  email: "info@boettopropiedades.com.ar",
+  email: "ventas@boettopropiedades.com",
   instagram: "boettopropiedades",
-  address: "Córdoba, Argentina",
+  address: "Capital Federal, Buenos Aires, Argentina",
   website: "https://boettopropiedades.com.ar",
 } as const;
 

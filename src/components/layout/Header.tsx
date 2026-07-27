@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/propiedades?operation=venta", label: "Comprar" },
@@ -17,30 +18,69 @@ const moreLinks = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    if (pathname !== "/") return;
+
+    let rafId = 0;
+
+    const updateHeader = () => {
+      rafId = 0;
+      const boundary = document.querySelector<HTMLElement>(
+        "[data-header-boundary]"
+      );
+      const shouldMaterialize = boundary
+        ? boundary.getBoundingClientRect().top <= 72
+        : false;
+
+      setScrolled((current) =>
+        current === shouldMaterialize ? current : shouldMaterialize
+      );
+    };
+
+    const requestUpdate = () => {
+      if (!rafId) rafId = window.requestAnimationFrame(updateHeader);
+    };
+
+    requestUpdate();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, [pathname]);
+
+  const materialized = pathname !== "/" || scrolled;
 
   return (
     <header
-      className={`site-header ${scrolled ? "is-scrolled" : ""} ${
+      className={`site-header ${materialized ? "is-scrolled" : ""} ${
         open ? "is-menu-open" : ""
       }`}
     >
       <Link href="/" className="site-header__logo" aria-label="Boetto Propiedades, inicio">
         <Image
+          className="site-header__logo-image site-header__logo-image--light"
           src="/logos/logo-white.svg"
           alt="Boetto Propiedades"
           width={220}
           height={52}
           preload
+        />
+        <Image
+          className="site-header__logo-image site-header__logo-image--color"
+          src="/logos/logo-color.svg"
+          alt=""
+          aria-hidden="true"
+          width={220}
+          height={52}
         />
       </Link>
 

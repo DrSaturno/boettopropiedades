@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { COMPANY_INFO } from "@/lib/constants";
 
 const navigation = [
   ["Propiedades", "/propiedades"],
@@ -23,24 +24,26 @@ export default function Footer() {
         <p>
           Curaduría inmobiliaria
           <br />
-          en Córdoba desde 1987.
+          en Capital Federal.
         </p>
-        <a href="tel:+543514567890">+54 351 456 7890</a>
+        <a href={`tel:${COMPANY_INFO.phone.replace(/\s/g, "")}`}>
+          {COMPANY_INFO.phone}
+        </a>
       </div>
 
       <div className="site-footer__grid">
         <div>
           <p className="footer-label">Visitanos</p>
           <p>
-            Recta Martinolli 7480
+            Capital Federal
             <br />
-            Córdoba · Argentina
+            Buenos Aires · Argentina
           </p>
         </div>
         <div>
           <p className="footer-label">Escribinos</p>
-          <a href="mailto:hola@boettopropiedades.com.ar">
-            hola@boettopropiedades.com.ar
+          <a href={`mailto:${COMPANY_INFO.email}`}>
+            {COMPANY_INFO.email}
           </a>
         </div>
         <nav aria-label="Navegación secundaria">
@@ -64,7 +67,7 @@ export default function Footer() {
       <div className="site-footer__bottom">
         <span>© {new Date().getFullYear()} Boetto Propiedades</span>
         <span>Privacidad · Términos</span>
-        <span>Hecho con criterio en Córdoba</span>
+        <span>Hecho con criterio en Capital Federal</span>
       </div>
     </footer>
   );

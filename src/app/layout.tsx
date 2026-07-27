@@ -19,15 +19,16 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "Boetto Propiedades | Curaduría inmobiliaria en Córdoba",
+    default: "Boetto Propiedades | Curaduría inmobiliaria en Capital Federal",
     template: "%s | Boetto Propiedades",
   },
   description:
-    "Propiedades con arquitectura, contexto y carácter. Venta, alquiler y tasación en Córdoba.",
+    "Propiedades con arquitectura, contexto y carácter. Venta, alquiler y tasación en Capital Federal.",
   keywords: [
     "inmobiliaria",
     "propiedades",
-    "córdoba",
+    "capital federal",
+    "buenos aires",
     "venta",
     "alquiler",
     "tasaciones",
@@ -37,8 +38,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_AR",
     siteName: "Boetto Propiedades",
-    title: "Boetto Propiedades | Curaduría inmobiliaria en Córdoba",
-    description: "Propiedades con arquitectura, contexto y carácter en Córdoba.",
+    title: "Boetto Propiedades | Curaduría inmobiliaria en Capital Federal",
+    description: "Propiedades con arquitectura, contexto y carácter en Capital Federal.",
   },
 };
 
