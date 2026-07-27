@@ -86,13 +86,11 @@ export default function Footer() {
       <div className="footer-modern__bottom">
         <span>© {new Date().getFullYear()} Boetto Propiedades</span>
         <span>
-          By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
+          <a href="https://www.planetasaturno.com" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }} className="hover:text-white transition-colors">
+            By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
+          </a>
         </span>
         <span>Privacidad · Terminos</span>
-      </div>
-
-      <div className="footer-modern__mega-text" aria-hidden="true">
-        BOETTO
       </div>
     </footer>
   );

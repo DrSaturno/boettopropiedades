@@ -460,10 +460,10 @@ export default function HomeExperience() {
       </section>
 
       <section
-        className="agency-section agency-section--contact"
+        className="agency-section--contact"
         data-header-boundary
       >
-        <div className="section-shell closing-panel" data-reveal>
+        <div className="closing-panel w-full" data-reveal>
           <div className="closing-panel__copy">
             <div>
               <p className="eyebrow">Proxima conversacion</p>
@@ -492,7 +492,8 @@ export default function HomeExperience() {
                 src="/images/boetto-next-visit.png"
                 alt=""
                 fill
-                sizes="(max-width: 900px) 100vw, 34vw"
+                sizes="100vw"
+                className="object-cover"
               />
             </div>
           </div>

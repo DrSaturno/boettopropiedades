@@ -112,8 +112,10 @@ export default function AdminSidebar() {
             Cerrar sesion
           </button>
         </div>
-        <div className="text-[10px] uppercase tracking-wider text-white/30 text-center">
-          By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
+        <div className="text-[10px] uppercase tracking-wider text-white/30 text-center hover:text-white/80 transition-colors">
+          <a href="https://www.planetasaturno.com" target="_blank" rel="noopener noreferrer">
+            By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
+          </a>
         </div>
       </div>
     </aside>

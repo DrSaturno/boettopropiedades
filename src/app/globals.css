@@ -1688,19 +1688,7 @@ button {
   justify-self: end;
 }
 
-.footer-modern__mega-text {
-  width: 100%;
-  margin-bottom: -15%;
-  color: rgba(255, 255, 255, 0.025);
-  font-family: var(--font-playfair), Georgia, serif;
-  font-size: 26.5vw;
-  font-weight: 400;
-  letter-spacing: -0.05em;
-  line-height: 0.75;
-  text-align: center;
-  user-select: none;
-  pointer-events: none;
-}
+
 
 /* Supporting app defaults */
 
@@ -2937,7 +2925,7 @@ textarea:-webkit-autofill {
 }
 
 .agency-section--contact {
-  padding: 94px 0;
+  padding: 0;
   border-top: 0;
   background: var(--brand-cream-official);
 }
@@ -3154,13 +3142,62 @@ textarea:-webkit-autofill {
   gap: 34px;
   align-items: stretch;
   border-color: rgba(11, 11, 11, 0.1);
-  box-shadow: 0 28px 60px rgba(11, 11, 11, 0.16);
+.closing-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 70vh;
+  padding: 60px 40px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.closing-panel__visual {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.closing-panel__visual::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 15, 12, 0.1) 0%, rgba(14, 15, 12, 0.9) 100%);
+  content: "";
+}
+
+.closing-panel__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.closing-panel__image img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
 }
 
 .closing-panel__copy {
+  position: relative;
+  z-index: 2;
   display: grid;
   gap: 28px;
-  align-content: space-between;
+  color: #fff;
+  max-width: 800px;
+}
+
+.closing-panel__copy .eyebrow {
+  color: var(--brand-warm);
+}
+
+.closing-panel__copy h2 {
+  color: #fff;
+}
+
+.closing-panel__copy p {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .closing-panel__actions {
@@ -3170,22 +3207,6 @@ textarea:-webkit-autofill {
   gap: 24px;
 }
 
-.closing-panel__visual {
-  min-width: 0;
-}
-
-.closing-panel__image {
-  position: relative;
-  min-height: 100%;
-  overflow: hidden;
-  aspect-ratio: 4 / 4.6;
-  background: var(--paper-deep);
-}
-
-.closing-panel__image img {
-  object-fit: cover;
-}
-
 .closing-panel__primary {
   display: inline-flex;
   min-height: 54px;
@@ -3193,10 +3214,10 @@ textarea:-webkit-autofill {
   align-items: center;
   justify-content: center;
   gap: 26px;
-  border: 1px solid var(--brand-charcoal);
+  border: 1px solid #fff;
   border-radius: 999px;
-  background: var(--brand-charcoal);
-  color: var(--brand-cream-official);
+  background: #fff;
+  color: var(--brand-charcoal);
   font-size: 0.64rem;
   font-weight: 700;
   letter-spacing: 0.13em;
@@ -3211,7 +3232,7 @@ textarea:-webkit-autofill {
 .closing-panel__primary:hover {
   border-color: var(--brand-warm);
   background: var(--brand-warm);
-  color: var(--brand-charcoal);
+  color: #fff;
   box-shadow: 0 18px 38px rgba(46, 44, 41, 0.2);
 }
 
@@ -3228,9 +3249,16 @@ textarea:-webkit-autofill {
 
 .closing-panel__actions > a:last-child {
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(46, 44, 41, 0.28);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
   font-size: 0.76rem;
   letter-spacing: 0.04em;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+
+.closing-panel__actions > a:last-child:hover {
+  border-color: var(--brand-warm);
+  color: var(--brand-warm);
 }
 
 .agency-section--form {
@@ -3555,8 +3583,7 @@ textarea:-webkit-autofill {
     padding: 86px 0;
   }
 
-  .agency-search__intro,
-  .closing-panel {
+  .agency-search__intro {
     grid-template-columns: 1fr;
   }
 
@@ -3617,9 +3644,6 @@ textarea:-webkit-autofill {
     padding: 24px;
   }
 
-  .closing-panel__image {
-    aspect-ratio: 16 / 11;
-  }
 
   .contact-layout__form {
     width: min(100%, 720px);
