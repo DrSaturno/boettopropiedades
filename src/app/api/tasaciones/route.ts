@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { deliverInquiryNotification } from "@/lib/inquiry-notifications";
 
 export async function POST(request: Request) {
   try {
@@ -27,7 +28,21 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ success: true, id: inquiry.id });
+    const notificationStatus = await deliverInquiryNotification({
+      id: inquiry.id,
+      name: inquiry.name,
+      email: inquiry.email,
+      phone: inquiry.phone,
+      message: inquiry.message,
+      type: inquiry.type,
+      createdAt: inquiry.createdAt,
+    });
+
+    return NextResponse.json({
+      success: true,
+      id: inquiry.id,
+      notificationStatus,
+    });
   } catch {
     return NextResponse.json({ error: "Error al procesar la solicitud" }, { status: 500 });
   }

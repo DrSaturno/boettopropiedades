@@ -43,16 +43,19 @@ model Property {
 }
 
 model Inquiry {
-  id         Int       @id @default(autoincrement())
-  name       String
-  phone      String?
-  email      String
-  message    String?
-  type       String    @default("contact")
-  propertyId Int?
-  property   Property? @relation(fields: [propertyId], references: [id])
-  read       Boolean   @default(false)
-  createdAt  DateTime  @default(now())
+  id                 Int       @id @default(autoincrement())
+  name               String
+  phone              String?
+  email              String
+  message            String?
+  type               String    @default("contact")
+  propertyId         Int?
+  property           Property? @relation(fields: [propertyId], references: [id])
+  read               Boolean   @default(false)
+  notificationStatus String    @default("pending")
+  notificationError  String?
+  notifiedAt         DateTime?
+  createdAt          DateTime  @default(now())
 }
 
 model User {
