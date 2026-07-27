@@ -6,7 +6,7 @@ interface Props {
   propertyId?: number;
   propertyTitle?: string;
   type?: "contact" | "property" | "tasacion";
-  variant?: "default" | "editorial";
+  variant?: "default" | "editorial" | "dark";
 }
 
 export default function ContactForm({
@@ -48,7 +48,7 @@ export default function ContactForm({
 
   if (status === "success") {
     return (
-      <div className={`contact-form__success ${variant === "editorial" ? "contact-form__success--editorial" : ""} bg-brand-sage/10 border border-brand-sage/30 p-8 text-center`}>
+      <div className={`contact-form__success ${variant === "editorial" ? "contact-form__success--editorial" : variant === "dark" ? "contact-form__success--dark" : ""} bg-brand-sage/10 border border-brand-sage/30 p-8 text-center`}>
         <svg className="w-12 h-12 mx-auto text-brand-sage mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -63,7 +63,7 @@ export default function ContactForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`contact-form ${variant === "editorial" ? "contact-form--editorial" : ""} space-y-4`}
+      className={`contact-form ${variant === "editorial" ? "contact-form--editorial" : variant === "dark" ? "contact-form--dark" : ""} space-y-4`}
     >
       {propertyTitle && (
         <p className="text-sm text-brand-dark/60 mb-2">
