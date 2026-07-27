@@ -2,7 +2,7 @@
 
 ## Summary
 
-Todas las consultas creadas desde contacto, propiedades y tasaciones deben persistirse y generar una notificación dirigida a `ventas@boettopropiedades.com`.
+Todas las consultas creadas desde contacto, propiedades y tasaciones deben persistirse y generar una notificación dirigida a `info@boettopropiedades.com`.
 
 ## Goals
 
@@ -27,7 +27,7 @@ Todas las consultas creadas desde contacto, propiedades y tasaciones deben persi
 4. `SMTP_USER`
 5. `SMTP_PASS`
 6. `SMTP_FROM`
-7. `INQUIRY_EMAIL_TO`, opcional; por defecto usa `ventas@boettopropiedades.com`.
+7. `INQUIRY_EMAIL_TO`, opcional; por defecto usa `info@boettopropiedades.com`.
 
 ## Acceptance Criteria
 
@@ -38,4 +38,3 @@ Todas las consultas creadas desde contacto, propiedades y tasaciones deben persi
 5. El formulario recibe éxito si la consulta fue guardada, aunque el email falle.
 6. El cuerpo del correo incluye nombre, email, teléfono, tipo, mensaje y propiedad cuando corresponda.
 7. El build no incorpora secretos en el bundle cliente.
-

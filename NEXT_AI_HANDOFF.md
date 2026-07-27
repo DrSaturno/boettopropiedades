@@ -22,7 +22,7 @@ Este documento sigue los lineamientos de Spec-Driven Development (SDD). Es la fu
 - **Autenticación**: NextAuth (`/api/auth/[...nextauth]`) para proteger el panel `/admin`.
 - **Manejo de Formularios y Correos**: 
   - `react-hook-form` con validación en `zod`.
-  - Endpoint de contacto en `src/app/api/contacto/route.ts` que notifica a `ventas@boettopropiedades.com` vía Nodemailer (`src/lib/inquiry-email.ts`).
+  - Endpoint de contacto en `src/app/api/contacto/route.ts` que notifica a `info@boettopropiedades.com` vía Nodemailer (`src/lib/inquiry-email.ts`).
 
 ## 3. Guías de UI/UX y Diseño (Reglas Estrictas)
 

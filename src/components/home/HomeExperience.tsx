@@ -51,6 +51,8 @@ const heroChapters = [
   },
 ];
 
+const mobileHeroQuery = "(max-width: 900px)";
+
 const locationOptions = [
   { place: "Agronomia", context: "Capital Federal" },
   { place: "Almagro", context: "Capital Federal" },
@@ -159,6 +161,7 @@ export default function HomeExperience() {
   const [operation, setOperation] = useState("venta");
   const [videoReady, setVideoReady] = useState(false);
   const [activeChapter, setActiveChapter] = useState(0);
+  const [isMobileHero, setIsMobileHero] = useState(false);
   const [locationQuery, setLocationQuery] = useState("");
   const [locationOpen, setLocationOpen] = useState(false);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
@@ -182,10 +185,33 @@ export default function HomeExperience() {
   }, []);
 
   useEffect(() => {
+    const media = window.matchMedia(mobileHeroQuery);
+    const syncMobileHero = () => setIsMobileHero(media.matches);
+
+    syncMobileHero();
+    media.addEventListener("change", syncMobileHero);
+
+    return () => media.removeEventListener("change", syncMobileHero);
+  }, []);
+
+  useEffect(() => {
     const video = videoRef.current;
     const hero = heroRef.current;
 
     if (!video || !hero) return;
+
+    if (isMobileHero) {
+      hero.style.setProperty("--video-progress", "0.2");
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      void video.play().catch(() => undefined);
+
+      return () => {
+        video.loop = false;
+        video.pause();
+      };
+    }
 
     let rafId = 0;
     let targetProgress = 0;
@@ -206,7 +232,7 @@ export default function HomeExperience() {
       const delta = Math.min(time - previousFrame, 64);
       previousFrame = time;
 
-      const response = window.innerWidth <= 900 ? 92 : 118;
+      const response = 118;
       const blend = 1 - Math.exp(-delta / response);
       displayedProgress += (targetProgress - displayedProgress) * blend;
 
@@ -267,7 +293,7 @@ export default function HomeExperience() {
       window.removeEventListener("scroll", startAnimation);
       window.removeEventListener("resize", startAnimation);
     };
-  }, [videoReady]);
+  }, [videoReady, isMobileHero]);
 
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -285,29 +311,6 @@ export default function HomeExperience() {
         ? `/tasaciones?${params.toString()}`
         : `/propiedades?${params.toString()}`
     );
-  }
-
-  function handleHeroNudge() {
-    const hero = heroRef.current;
-
-    if (!hero) return;
-
-    const viewport = window.innerHeight || 1;
-    const heroTop = window.scrollY + hero.getBoundingClientRect().top;
-    const total = Math.max(hero.offsetHeight - viewport, 1);
-    const currentProgress = Math.min(
-      Math.max((window.scrollY - heroTop) / total, 0),
-      1
-    );
-    const nextProgress = Math.min(
-      Math.max(currentProgress + 0.27, 0.27),
-      1
-    );
-
-    window.scrollTo({
-      top: heroTop + total * nextProgress,
-      behavior: "smooth",
-    });
   }
 
   const filteredLocations = locationQuery.trim()
@@ -328,13 +331,19 @@ export default function HomeExperience() {
 
   return (
     <div className="agency-home">
-      <section className="scroll-hero" ref={heroRef} aria-labelledby="hero-title">
+      <section
+        className="scroll-hero"
+        ref={heroRef}
+        aria-labelledby={isMobileHero ? "hero-search-title" : "hero-title"}
+      >
         <div className="scroll-hero__sticky">
           <video
             ref={videoRef}
             className="scroll-hero__video"
             src="/video/boetto-luxury-tour.mp4"
             poster="/images/boetto-hero-aerial.png"
+            autoPlay={isMobileHero}
+            loop={isMobileHero}
             muted
             playsInline
             preload="auto"
@@ -345,23 +354,30 @@ export default function HomeExperience() {
 
 
           <div className="scroll-hero__chapters">
-            {heroChapters.map((chapter, index) => (
-              <article
-                className={`scroll-hero__chapter ${
-                  activeChapter === index ? "is-active" : ""
-                } ${chapter.search ? "scroll-hero__chapter--search" : ""}`}
-                key={chapter.kicker}
-                aria-hidden={activeChapter !== index}
-              >
-                <p className="eyebrow eyebrow--light">{chapter.kicker}</p>
-                {index === 0 ? (
-                  <h1 id="hero-title">{chapter.title}</h1>
-                ) : (
-                  <h2>{chapter.title}</h2>
-                )}
-                <p className="scroll-hero__lead">{chapter.text}</p>
-                {chapter.search && (
-                  <form className="hero-search" onSubmit={handleSearch} id="buscar">
+            {heroChapters.map((chapter, index) => {
+              const isVisible = isMobileHero
+                ? Boolean(chapter.search)
+                : activeChapter === index;
+
+              return (
+                <article
+                  className={`scroll-hero__chapter ${
+                    isVisible ? "is-active" : ""
+                  } ${chapter.search ? "scroll-hero__chapter--search" : ""}`}
+                  key={chapter.kicker}
+                  aria-hidden={!isVisible}
+                >
+                  <p className="eyebrow eyebrow--light">{chapter.kicker}</p>
+                  {index === 0 ? (
+                    <h1 id="hero-title">{chapter.title}</h1>
+                  ) : (
+                    <h2 id={chapter.search ? "hero-search-title" : undefined}>
+                      {chapter.title}
+                    </h2>
+                  )}
+                  <p className="scroll-hero__lead">{chapter.text}</p>
+                  {chapter.search && (
+                    <form className="hero-search" onSubmit={handleSearch} id="buscar">
                     <div className="hero-search__modes" aria-label="Tipo de operacion">
                       {[
                         ["venta", "Comprar"],
@@ -452,23 +468,12 @@ export default function HomeExperience() {
                         <span>Buscar</span>
                       </button>
                     </div>
-                  </form>
-                )}
-              </article>
-            ))}
+                    </form>
+                  )}
+                </article>
+              );
+            })}
           </div>
-
-          <button
-            type="button"
-            className={`scroll-hero__mobile-cue ${
-              activeChapter > 0 ? "is-hidden" : ""
-            }`}
-            onClick={handleHeroNudge}
-            aria-label="Avanzar en el recorrido"
-          >
-            <span>Desliza</span>
-            <i aria-hidden="true" />
-          </button>
 
         </div>
       </section>

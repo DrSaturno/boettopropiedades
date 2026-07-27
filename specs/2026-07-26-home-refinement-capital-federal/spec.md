@@ -16,7 +16,7 @@ La versión actual tiene cinco capítulos en el hero, textos que pueden acercars
 4. Limitar las ubicaciones públicas a Capital Federal.
 5. Reemplazar las tarjetas de servicios por tres piezas editoriales con imágenes que transmitan confianza.
 6. Eliminar la sección de barrido por zonas.
-7. Reforzar la llamada a conversación y usar `ventas@boettopropiedades.com`.
+7. Reforzar la llamada a conversación y usar `info@boettopropiedades.com`.
 8. Respetar los logos horizontales oficiales de la carpeta de branding y corregir su encuadre en header y footer.
 9. Aplicar la paleta oficial del manual de identidad.
 10. Cerrar la home con un formulario de contacto.
@@ -64,7 +64,7 @@ La versión actual tiene cinco capítulos en el hero, textos que pueden acercars
 
 ### Contacto
 
-1. El CTA principal abre un correo dirigido a `ventas@boettopropiedades.com`.
+1. El CTA principal abre un correo dirigido a `info@boettopropiedades.com`.
 2. El mismo correo se usa en constantes, home y footer.
 3. El contenido público menciona Capital Federal.
 
@@ -76,7 +76,7 @@ La versión actual tiene cinco capítulos en el hero, textos que pueden acercars
 4. El buscador solo sugiere barrios de Capital Federal.
 5. La primera sección posterior al hero contiene exactamente tres tarjetas con imagen.
 6. La sección de zonas ya no se renderiza.
-7. El CTA destacado y el correo visible usan `ventas@boettopropiedades.com`.
+7. El CTA destacado y el correo visible usan `info@boettopropiedades.com`.
 8. Header y footer usan assets oficiales de branding sin recortes visibles.
 9. El build de producción finaliza correctamente.
 10. La sección “Próxima conversación” es la primera después del hero.

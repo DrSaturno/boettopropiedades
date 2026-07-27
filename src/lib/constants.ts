@@ -35,7 +35,7 @@ export const COMPANY_INFO = {
   name: "Boetto Propiedades",
   phone: "11 4563-2384",
   phoneHref: "+541145632384",
-  email: "ventas@boettopropiedades.com",
+  email: "info@boettopropiedades.com",
   instagram: "boettopropiedades",
   address: "Carlos Antonio Lopez 3483, Capital Federal",
   hours: "Lunes a viernes de 10:00 a 19:00 hrs",

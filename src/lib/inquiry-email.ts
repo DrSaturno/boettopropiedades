@@ -3,6 +3,8 @@ import "server-only";
 import nodemailer from "nodemailer";
 import { COMPANY_INFO } from "@/lib/constants";
 
+const LEGACY_BUSINESS_EMAIL = "ventas@boettopropiedades.com";
+
 export interface InquiryEmailPayload {
   id: number;
   name: string;
@@ -42,6 +44,16 @@ function inquiryLabel(type: string) {
   return "Consulta general";
 }
 
+function resolveBusinessEmail(value?: string) {
+  const email = value?.trim();
+
+  if (!email || email.toLowerCase() === LEGACY_BUSINESS_EMAIL) {
+    return COMPANY_INFO.email;
+  }
+
+  return email;
+}
+
 function smtpTransport() {
   const host = requiredEnvironment("SMTP_HOST");
   const port = Number(requiredEnvironment("SMTP_PORT"));
@@ -64,9 +76,11 @@ function smtpTransport() {
 }
 
 export async function sendInquiryEmail(payload: InquiryEmailPayload) {
-  const destination =
-    process.env.INQUIRY_EMAIL_TO?.trim() || COMPANY_INFO.email;
-  const sender = requiredEnvironment("SMTP_FROM");
+  const destination = resolveBusinessEmail(process.env.INQUIRY_EMAIL_TO);
+  const sender = requiredEnvironment("SMTP_FROM").replace(
+    LEGACY_BUSINESS_EMAIL,
+    COMPANY_INFO.email
+  );
   const label = inquiryLabel(payload.type);
   const date = new Intl.DateTimeFormat("es-AR", {
     dateStyle: "long",

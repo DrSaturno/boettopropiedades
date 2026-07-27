@@ -15,4 +15,4 @@
 ## External Configuration
 
 - [ ] Cargar credenciales SMTP válidas.
-- [ ] Ejecutar una prueba de entrega real a `ventas@boettopropiedades.com`.
+- [ ] Ejecutar una prueba de entrega real a `info@boettopropiedades.com`.
