@@ -2402,7 +2402,7 @@ textarea:-webkit-autofill {
 
 .scroll-hero__chapter h1,
 .scroll-hero__chapter h2 {
-  margin: 20px 0 28px;
+  margin: 0 0 28px;
   font-family: var(--font-playfair), Georgia, serif;
   font-size: clamp(4.1rem, 6.8vw, 7.35rem);
   font-weight: 400;
@@ -2934,16 +2934,6 @@ textarea:-webkit-autofill {
   transform: scale(1.035);
 }
 
-.service-card__media > span {
-  position: absolute;
-  z-index: 1;
-  right: 18px;
-  top: 18px;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 0.58rem;
-  letter-spacing: 0.16em;
-}
-
 .service-card__copy {
   position: relative;
   z-index: 2;
@@ -2952,18 +2942,9 @@ textarea:-webkit-autofill {
   color: #fff;
 }
 
-.service-card__copy > .eyebrow {
-  color: var(--brand-warm);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
 .service-card h3 {
   display: block;
-  margin: 14px 0 16px;
+  margin: 0 0 16px;
   font-family: var(--font-playfair), Georgia, serif;
   font-size: clamp(1.65rem, 2.4vw, 2.15rem);
   font-weight: 400;
@@ -3126,11 +3107,8 @@ textarea:-webkit-autofill {
   max-width: 800px;
 }
 
-.closing-panel__copy .eyebrow {
-  color: var(--brand-warm);
-}
-
 .closing-panel__copy h2 {
+  margin-top: 0;
   color: #fff;
 }
 
@@ -3216,12 +3194,8 @@ textarea:-webkit-autofill {
   max-width: 610px;
 }
 
-.contact-layout__intro .eyebrow {
-  color: var(--brand-warm);
-}
-
 .contact-layout__intro h2 {
-  margin: 18px 0 30px;
+  margin: 0 0 30px;
   color: var(--brand-charcoal);
 }
 

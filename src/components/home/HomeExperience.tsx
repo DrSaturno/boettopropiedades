@@ -9,7 +9,7 @@ import { COMPANY_INFO } from "@/lib/constants";
 
 const heroChapters = [
   {
-    kicker: "Curaduria inmobiliaria",
+    key: "curaduria",
     title: (
       <>
         Una propiedad se elige
@@ -19,7 +19,7 @@ const heroChapters = [
     text: "El recorrido acompana una idea simple: antes de mostrar opciones, entendemos la vida que queres construir.",
   },
   {
-    kicker: "Primero · La busqueda",
+    key: "busqueda",
     title: (
       <>
         Empezamos por
@@ -29,7 +29,7 @@ const heroChapters = [
     text: "Rutinas, luz, tiempos, expansion y entorno. La busqueda empieza con preguntas precisas, no con una lista infinita.",
   },
   {
-    kicker: "Despues · El contexto",
+    key: "contexto",
     title: (
       <>
         Leemos el lugar
@@ -39,7 +39,7 @@ const heroChapters = [
     text: "Orientacion, accesos, arquitectura y valor futuro nos permiten seleccionar menos opciones y compararlas con mas criterio.",
   },
   {
-    kicker: "Finalmente · Tu busqueda",
+    key: "formulario",
     title: (
       <>
         Empecemos por
@@ -115,21 +115,18 @@ const propertyTypes = [
 
 const services = [
   {
-    label: "Acompañamiento",
     title: "Busqueda guiada",
     text: "Traducimos prioridades reales, tiempos y estilo de vida en una seleccion breve, familiar y bien acompaniada.",
     image: "/images/boetto-service-family-guidance.png",
     alt: "Asesora inmobiliaria conversando con una pareja en un living luminoso",
   },
   {
-    label: "Estrategia",
     title: "Contexto y claridad",
     text: "Ordenamos zonas, tipologias y presupuesto para que cada decision se sienta cercana, posible y bien cuidada.",
     image: "/images/boetto-service-family-context.png",
     alt: "Familia recorriendo una casa calida junto a una asesora inmobiliaria",
   },
   {
-    label: "Criterio",
     title: "Visitas con calma",
     text: "Seleccionamos propiedades para visitar con informacion precisa, sensibilidad humana y foco en lo que importa.",
     image: "/images/boetto-service-family-visit.png",
@@ -364,10 +361,9 @@ export default function HomeExperience() {
                   className={`scroll-hero__chapter ${
                     isVisible ? "is-active" : ""
                   } ${chapter.search ? "scroll-hero__chapter--search" : ""}`}
-                  key={chapter.kicker}
+                  key={chapter.key}
                   aria-hidden={!isVisible}
                 >
-                  <p className="eyebrow eyebrow--light">{chapter.kicker}</p>
                   {index === 0 ? (
                     <h1 id="hero-title">{chapter.title}</h1>
                   ) : (
@@ -485,7 +481,6 @@ export default function HomeExperience() {
         <div className="section-shell closing-panel" data-reveal>
           <div className="closing-panel__copy">
             <div>
-              <p className="eyebrow">Proxima conversacion</p>
               <h2>Una busqueda bien acompañada empieza mucho antes de una visita.</h2>
             </div>
 
@@ -522,12 +517,11 @@ export default function HomeExperience() {
       <section className="agency-section agency-section--services">
         <div className="section-shell agency-grid">
           <div className="agency-grid__headline" data-reveal>
-            <p className="eyebrow">Como trabaja el estudio</p>
             <h2>Informacion precisa para decidir con calma.</h2>
           </div>
 
           <div className="service-list">
-            {services.map((service, index) => (
+            {services.map((service) => (
               <article key={service.title} className="service-card" data-reveal>
                 <div className="service-card__media">
                   <Image
@@ -536,10 +530,8 @@ export default function HomeExperience() {
                     fill
                     sizes="(max-width: 900px) 100vw, 33vw"
                   />
-                  <span aria-hidden="true">0{index + 1}</span>
                 </div>
                 <div className="service-card__copy">
-                  <p className="eyebrow">{service.label}</p>
                   <h3>{service.title}</h3>
                   <p>{service.text}</p>
                 </div>
@@ -552,7 +544,6 @@ export default function HomeExperience() {
       <section className="agency-section agency-section--form" id="contacto">
         <div className="section-shell contact-layout">
           <div className="contact-layout__intro" data-reveal>
-            <p className="eyebrow eyebrow--light">Contacto</p>
             <h2>Hablemos de tu proxima decision.</h2>
             <p>
               Dejanos tus datos y una breve idea de lo que necesitas. El equipo
