@@ -1775,9 +1775,14 @@ textarea:-webkit-autofill {
   }
 
   .site-header.is-menu-open {
+    height: 100svh;
+    align-items: start;
+    padding-top: 12px;
     border-bottom-color: transparent;
     background: var(--ink);
     color: #fff;
+    backdrop-filter: none;
+    box-shadow: none;
   }
 
   .site-header.is-menu-open .site-header__logo-image--light {

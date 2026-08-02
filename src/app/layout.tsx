@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import "./interiors.css";
 import SiteChrome from "@/components/layout/SiteChrome";
 
 const dmSans = DM_Sans({
@@ -50,6 +51,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      data-scroll-behavior="smooth"
       className={`${dmSans.variable} ${playfair.variable} antialiased`}
     >
       <body>

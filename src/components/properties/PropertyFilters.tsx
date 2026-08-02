@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { OPERATIONS, PROPERTY_TYPES } from "@/lib/constants";
@@ -11,115 +12,124 @@ export default function PropertyFilters() {
   const updateFilter = useCallback(
     (key: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
+      if (value) params.set(key, value);
+      else params.delete(key);
       router.push(`/propiedades?${params.toString()}`);
     },
     [router, searchParams]
   );
 
+  const rawPropertyType = searchParams.get("propertyType") || "";
+  const multiplePropertyTypes = rawPropertyType.includes(",");
+
   return (
-    <div className="bg-brand-surface border border-brand-warm-gray/50 p-6 mb-8">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div>
-          <label className="block text-xs font-medium text-brand-dark/60 uppercase tracking-wider mb-1.5">
-            Operación
-          </label>
+    <div className="catalog-filters" aria-label="Filtros de propiedades">
+      <div className="catalog-filters__grid">
+        <label>
+          <span>Operación</span>
           <select
             value={searchParams.get("operation") || ""}
-            onChange={(e) => updateFilter("operation", e.target.value)}
-            className="w-full px-3 py-2.5 border border-brand-warm-gray rounded-sm text-sm bg-brand-surface focus:outline-none focus:border-brand-sage"
+            onChange={(event) => updateFilter("operation", event.target.value)}
           >
             <option value="">Todas</option>
-            {OPERATIONS.map((op) => (
-              <option key={op.value} value={op.value}>{op.label}</option>
+            {OPERATIONS.map((operation) => (
+              <option key={operation.value} value={operation.value}>
+                {operation.label}
+              </option>
             ))}
           </select>
-        </div>
+        </label>
 
-        <div>
-          <label className="block text-xs font-medium text-brand-dark/60 uppercase tracking-wider mb-1.5">
-            Tipo
-          </label>
+        <label>
+          <span>Tipo</span>
           <select
-            value={searchParams.get("propertyType") || ""}
-            onChange={(e) => updateFilter("propertyType", e.target.value)}
-            className="w-full px-3 py-2.5 border border-brand-warm-gray rounded-sm text-sm bg-brand-surface focus:outline-none focus:border-brand-sage"
+            value={rawPropertyType}
+            onChange={(event) =>
+              updateFilter("propertyType", event.target.value)
+            }
           >
             <option value="">Todos</option>
-            {PROPERTY_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>{t.label}</option>
+            {multiplePropertyTypes ? (
+              <option value={rawPropertyType}>Varios tipos</option>
+            ) : null}
+            {PROPERTY_TYPES.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
             ))}
           </select>
-        </div>
+        </label>
 
-        <div>
-          <label className="block text-xs font-medium text-brand-dark/60 uppercase tracking-wider mb-1.5">
-            Ubicación
-          </label>
+        <label>
+          <span>Ubicación</span>
           <input
+            key={searchParams.get("city") || "all-locations"}
             type="text"
-            placeholder="Ciudad o barrio"
+            placeholder="Barrio o zona"
             defaultValue={searchParams.get("city") || ""}
-            onBlur={(e) => updateFilter("city", e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") updateFilter("city", e.currentTarget.value);
+            onBlur={(event) => updateFilter("city", event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                updateFilter("city", event.currentTarget.value);
+              }
             }}
-            className="w-full px-3 py-2.5 border border-brand-warm-gray rounded-sm text-sm placeholder:text-brand-medium-gray focus:outline-none focus:border-brand-sage"
           />
-        </div>
+        </label>
 
-        <div>
-          <label className="block text-xs font-medium text-brand-dark/60 uppercase tracking-wider mb-1.5">
-            Precio mínimo
-          </label>
+        <label>
+          <span>Precio desde</span>
           <input
+            key={searchParams.get("minPrice") || "no-minimum"}
             type="number"
-            placeholder="Desde"
+            min="0"
+            placeholder="Sin mínimo"
             defaultValue={searchParams.get("minPrice") || ""}
-            onBlur={(e) => updateFilter("minPrice", e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") updateFilter("minPrice", e.currentTarget.value);
+            onBlur={(event) => updateFilter("minPrice", event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                updateFilter("minPrice", event.currentTarget.value);
+              }
             }}
-            className="w-full px-3 py-2.5 border border-brand-warm-gray rounded-sm text-sm placeholder:text-brand-medium-gray focus:outline-none focus:border-brand-sage"
           />
-        </div>
+        </label>
 
-        <div>
-          <label className="block text-xs font-medium text-brand-dark/60 uppercase tracking-wider mb-1.5">
-            Precio máximo
-          </label>
+        <label>
+          <span>Precio hasta</span>
           <input
+            key={searchParams.get("maxPrice") || "no-maximum"}
             type="number"
-            placeholder="Hasta"
+            min="0"
+            placeholder="Sin máximo"
             defaultValue={searchParams.get("maxPrice") || ""}
-            onBlur={(e) => updateFilter("maxPrice", e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") updateFilter("maxPrice", e.currentTarget.value);
+            onBlur={(event) => updateFilter("maxPrice", event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                updateFilter("maxPrice", event.currentTarget.value);
+              }
             }}
-            className="w-full px-3 py-2.5 border border-brand-warm-gray rounded-sm text-sm placeholder:text-brand-medium-gray focus:outline-none focus:border-brand-sage"
           />
-        </div>
+        </label>
 
-        <div>
-          <label className="block text-xs font-medium text-brand-dark/60 uppercase tracking-wider mb-1.5">
-            Dormitorios
-          </label>
+        <label>
+          <span>Dormitorios</span>
           <select
             value={searchParams.get("bedrooms") || ""}
-            onChange={(e) => updateFilter("bedrooms", e.target.value)}
-            className="w-full px-3 py-2.5 border border-brand-warm-gray rounded-sm text-sm bg-brand-surface focus:outline-none focus:border-brand-sage"
+            onChange={(event) => updateFilter("bedrooms", event.target.value)}
           >
             <option value="">Todos</option>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>{n}+</option>
+            {[1, 2, 3, 4, 5].map((number) => (
+              <option key={number} value={number}>
+                {number} o más
+              </option>
             ))}
           </select>
-        </div>
+        </label>
       </div>
+
+      <Link href="/propiedades" className="catalog-filters__reset">
+        Limpiar filtros
+        <span aria-hidden="true">×</span>
+      </Link>
     </div>
   );
 }

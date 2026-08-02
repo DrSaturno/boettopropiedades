@@ -1,72 +1,110 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import InteriorHero from "@/components/layout/InteriorHero";
 import TasacionForm from "@/components/forms/TasacionForm";
 import { getWhatsAppUrl } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Tasaciones",
-  description: "Solicitá una tasación profesional y gratuita de tu propiedad con Boetto Propiedades.",
+  description:
+    "Solicitá una tasación profesional de tu propiedad en Capital Federal con Boetto Propiedades.",
 };
+
+const process = [
+  {
+    title: "Leemos la propiedad",
+    text: "Relevamos estado, tipología, orientación, calidad constructiva y los atributos que la vuelven singular.",
+  },
+  {
+    title: "Estudiamos el contexto",
+    text: "Contrastamos operaciones reales, oferta comparable y el momento particular de cada micromercado.",
+  },
+  {
+    title: "Definimos una estrategia",
+    text: "Entregamos una estimación fundada y una recomendación clara para vender o alquilar con criterio.",
+  },
+];
 
 export default function TasacionesPage() {
   return (
-    <>
-      <section className="bg-brand-cream py-16">
-        <div className="container-wide">
-          <p className="text-brand-sage text-sm uppercase tracking-[0.3em] mb-3 font-medium">Tasaciones</p>
-          <h1 className="text-3xl md:text-4xl font-serif font-medium text-brand-dark">Conocé el valor de tu propiedad</h1>
+    <div className="inner-page valuations-page">
+      <InteriorHero
+        index="02"
+        kicker="Tasaciones"
+        title={
+          <>
+            El valor real
+            <em>necesita contexto.</em>
+          </>
+        }
+        summary="Tasamos con información concreta, lectura de mercado y una mirada atenta sobre aquello que hace distinta a cada propiedad."
+        image="/images/boetto-penthouse.png"
+        imageAlt="Terraza contemporánea con vistas urbanas en Capital Federal"
+        caption="Valoración · estrategia · decisión"
+        imagePosition="top"
+      />
+
+      <section className="valuation-process">
+        <div className="section-shell">
+          <div className="interior-section-heading valuation-process__heading">
+            <div>
+              <p className="eyebrow">Cómo trabajamos</p>
+              <h2>Una valuación precisa no sale de una fórmula automática.</h2>
+            </div>
+            <p>
+              La cifra importa, pero también cómo se construye. Nuestro proceso
+              ordena la información para que puedas decidir el próximo paso con
+              claridad.
+            </p>
+          </div>
+
+          <ol className="valuation-steps">
+            {process.map((step, index) => (
+              <li key={step.title}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container-wide">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <div>
-              <h2 className="text-2xl font-serif font-medium text-brand-dark mb-6">
-                Tasación profesional y sin compromiso
-              </h2>
-              <p className="text-brand-dark/60 leading-relaxed mb-6">
-                Realizamos una valuación precisa y actualizada de tu propiedad, basada en el análisis del mercado, la ubicación, las características del inmueble y las condiciones actuales del sector.
-              </p>
-
-              <div className="space-y-4 mb-8">
-                {[
-                  "Análisis comparativo del mercado inmobiliario de la zona",
-                  "Evaluación de las características y estado del inmueble",
-                  "Informe detallado con el valor estimado",
-                  "Asesoramiento sobre la mejor estrategia de venta o alquiler",
-                  "Sin costo ni compromiso",
-                ].map((benefit) => (
-                  <div key={benefit} className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-brand-sage shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <p className="text-sm text-brand-dark/70">{benefit}</p>
-                  </div>
-                ))}
-              </div>
-
-              <a
-                href={getWhatsAppUrl("Hola, me gustaría solicitar una tasación de mi propiedad.")}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] text-white text-sm font-medium hover:bg-[#20bd5a] transition-colors"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                </svg>
-                Consultar por WhatsApp
-              </a>
+      <section className="valuation-request" id="solicitar-tasacion">
+        <div className="section-shell valuation-request__layout">
+          <div className="valuation-request__intro">
+            <p className="eyebrow eyebrow--light">Primera evaluación</p>
+            <h2>Contanos qué propiedad querés tasar.</h2>
+            <p>
+              Con estos datos hacemos una primera lectura y nos comunicamos para
+              coordinar el relevamiento. La consulta es sin costo ni compromiso.
+            </p>
+            <div className="valuation-request__facts">
+              <span>Respuesta personalizada</span>
+              <span>Análisis de mercado</span>
+              <span>Recomendación de estrategia</span>
             </div>
+            <a
+              href={getWhatsAppUrl(
+                "Hola, me gustaría solicitar una tasación de mi propiedad."
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="valuation-request__whatsapp"
+            >
+              Consultar por WhatsApp
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
 
-            <div className="bg-brand-surface border border-brand-warm-gray/50 p-8">
-              <h3 className="text-lg font-serif font-medium text-brand-dark mb-6">
-                Solicitá tu tasación
-              </h3>
-              <TasacionForm />
+          <div className="valuation-request__form">
+            <div className="valuation-request__form-heading">
+              <span>Solicitud de tasación</span>
+              <p>Todos los campos marcados son necesarios.</p>
             </div>
+            <TasacionForm />
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

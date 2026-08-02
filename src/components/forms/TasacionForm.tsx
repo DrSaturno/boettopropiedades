@@ -4,16 +4,18 @@ import { useState } from "react";
 import { OPERATIONS, PROPERTY_TYPES } from "@/lib/constants";
 
 export default function TasacionForm() {
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setStatus("loading");
-    const form = e.currentTarget;
+    const form = event.currentTarget;
     const data = new FormData(form);
 
     try {
-      const res = await fetch("/api/tasaciones", {
+      const response = await fetch("/api/tasaciones", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -26,7 +28,8 @@ export default function TasacionForm() {
           message: data.get("message"),
         }),
       });
-      if (!res.ok) throw new Error();
+
+      if (!response.ok) throw new Error();
       setStatus("success");
       form.reset();
     } catch {
@@ -36,51 +39,109 @@ export default function TasacionForm() {
 
   if (status === "success") {
     return (
-      <div className="text-center py-8">
-        <svg className="w-12 h-12 mx-auto text-brand-sage mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <div className="valuation-form__success" role="status">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
         </svg>
-        <h3 className="text-lg font-serif text-brand-dark mb-2">Solicitud enviada</h3>
-        <p className="text-sm text-brand-dark/60">Nos comunicaremos a la brevedad para coordinar la tasación.</p>
+        <h3>Solicitud enviada</h3>
+        <p>Nos comunicaremos a la brevedad para coordinar la tasación.</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <input name="name" type="text" required placeholder="Nombre completo *" className="w-full px-4 py-3 border border-brand-warm-gray rounded-sm text-sm bg-brand-surface text-brand-dark placeholder:text-brand-medium-gray focus:outline-none focus:border-brand-sage transition-colors" />
+    <form onSubmit={handleSubmit} className="valuation-form">
+      <label className="valuation-form__group">
+        <span>Nombre completo *</span>
+        <input
+          name="name"
+          type="text"
+          required
+          autoComplete="name"
+          placeholder="Nombre y apellido"
+        />
+      </label>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <input name="email" type="email" required placeholder="Email *" className="w-full px-4 py-3 border border-brand-warm-gray rounded-sm text-sm bg-brand-surface text-brand-dark placeholder:text-brand-medium-gray focus:outline-none focus:border-brand-sage transition-colors" />
-        <input name="phone" type="tel" required placeholder="Teléfono *" className="w-full px-4 py-3 border border-brand-warm-gray rounded-sm text-sm bg-brand-surface text-brand-dark placeholder:text-brand-medium-gray focus:outline-none focus:border-brand-sage transition-colors" />
+      <div className="valuation-form__grid">
+        <label className="valuation-form__group">
+          <span>Email *</span>
+          <input
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            placeholder="nombre@email.com"
+          />
+        </label>
+        <label className="valuation-form__group">
+          <span>Teléfono *</span>
+          <input
+            name="phone"
+            type="tel"
+            required
+            autoComplete="tel"
+            placeholder="+54 11 ..."
+          />
+        </label>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <select name="propertyType" required className="w-full px-4 py-3 border border-brand-warm-gray rounded-sm text-sm text-brand-dark bg-brand-surface focus:outline-none focus:border-brand-sage transition-colors">
-          <option value="">Tipo de propiedad *</option>
-          {PROPERTY_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>{t.label}</option>
-          ))}
-        </select>
-        <select name="operation" required className="w-full px-4 py-3 border border-brand-warm-gray rounded-sm text-sm text-brand-dark bg-brand-surface focus:outline-none focus:border-brand-sage transition-colors">
-          <option value="">Operación deseada *</option>
-          {OPERATIONS.map((op) => (
-            <option key={op.value} value={op.value}>{op.label}</option>
-          ))}
-        </select>
+      <div className="valuation-form__grid">
+        <label className="valuation-form__group">
+          <span>Tipo de propiedad *</span>
+          <select name="propertyType" required defaultValue="">
+            <option value="" disabled>
+              Seleccionar
+            </option>
+            {PROPERTY_TYPES.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="valuation-form__group">
+          <span>Operación deseada *</span>
+          <select name="operation" required defaultValue="">
+            <option value="" disabled>
+              Seleccionar
+            </option>
+            {OPERATIONS.map((operation) => (
+              <option key={operation.value} value={operation.value}>
+                {operation.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
-      <input name="location" type="text" required placeholder="Ubicación de la propiedad *" className="w-full px-4 py-3 border border-brand-warm-gray rounded-sm text-sm bg-brand-surface text-brand-dark placeholder:text-brand-medium-gray focus:outline-none focus:border-brand-sage transition-colors" />
+      <label className="valuation-form__group">
+        <span>Ubicación de la propiedad *</span>
+        <input
+          name="location"
+          type="text"
+          required
+          placeholder="Barrio y dirección aproximada"
+        />
+      </label>
 
-      <textarea name="message" rows={3} placeholder="Comentarios adicionales..." className="w-full px-4 py-3 border border-brand-warm-gray rounded-sm text-sm bg-brand-surface text-brand-dark placeholder:text-brand-medium-gray focus:outline-none focus:border-brand-sage transition-colors resize-none" />
+      <label className="valuation-form__group">
+        <span>Comentarios adicionales</span>
+        <textarea
+          name="message"
+          rows={3}
+          placeholder="Superficie, estado o cualquier dato que quieras sumar."
+        />
+      </label>
 
-      <button type="submit" disabled={status === "loading"} className="w-full px-6 py-3 bg-brand-sage text-white text-sm font-medium tracking-wide hover:bg-brand-sage-dark transition-colors disabled:opacity-50">
+      <button type="submit" disabled={status === "loading"}>
         {status === "loading" ? "Enviando..." : "Solicitar tasación"}
       </button>
 
-      {status === "error" && (
-        <p className="text-red-600 text-sm text-center">Hubo un error. Intentá de nuevo.</p>
-      )}
+      {status === "error" ? (
+        <p className="valuation-form__error" role="alert">
+          No pudimos enviar la solicitud. Intentá nuevamente.
+        </p>
+      ) : null}
     </form>
   );
 }

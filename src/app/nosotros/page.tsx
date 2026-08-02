@@ -1,88 +1,109 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import InteriorHero from "@/components/layout/InteriorHero";
 
 export const metadata: Metadata = {
-  title: "Nosotros",
-  description: "Conocé a Boetto Propiedades. Trayectoria, valores y compromiso en el mercado inmobiliario de Córdoba.",
+  title: "Nuestro estudio",
+  description:
+    "Conocé el enfoque y el equipo de Boetto Propiedades en Capital Federal.",
 };
+
+const principles = [
+  {
+    title: "Escuchar antes de buscar",
+    text: "La operación empieza por entender tiempos, prioridades y la vida que cada persona quiere construir.",
+  },
+  {
+    title: "Explicar sin ruido",
+    text: "Ordenamos la información y señalamos lo importante para que cada decisión sea consciente y segura.",
+  },
+  {
+    title: "Acompañar hasta el final",
+    text: "Sostenemos el mismo nivel de atención desde la primera conversación hasta la firma y la entrega.",
+  },
+];
 
 export default function NosotrosPage() {
   return (
-    <>
-      <section className="bg-brand-cream py-16">
-        <div className="container-wide">
-          <p className="text-brand-sage text-sm uppercase tracking-[0.3em] mb-3 font-medium">Sobre nosotros</p>
-          <h1 className="text-3xl md:text-4xl font-serif font-medium text-brand-dark">Boetto Propiedades</h1>
-        </div>
-      </section>
+    <div className="inner-page studio-page">
+      <InteriorHero
+        index="03"
+        kicker="Nuestro estudio"
+        title={
+          <>
+            Conocemos propiedades.
+            <em>Entendemos personas.</em>
+          </>
+        }
+        summary="Somos un estudio inmobiliario de Capital Federal. Combinamos conocimiento de mercado, sensibilidad por la arquitectura y un acompañamiento verdaderamente cercano."
+        image="/images/boetto-team.png"
+        imageAlt="Equipo de Boetto Propiedades en su estudio"
+        caption="Criterio profesional · trato cercano"
+        imagePosition="center"
+      />
 
-      <section className="py-20">
-        <div className="container-wide">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-            <div className="space-y-6">
-              <h2 className="text-2xl font-serif font-medium text-brand-dark">Nuestra historia</h2>
-              <p className="text-brand-dark/60 leading-relaxed">
-                Boetto Propiedades nació con la convicción de que cada persona merece un acompañamiento profesional y humano a la hora de tomar una de las decisiones más importantes de su vida: elegir dónde vivir.
-              </p>
-              <p className="text-brand-dark/60 leading-relaxed">
-                Con más de una década de experiencia en el mercado inmobiliario de Córdoba, hemos construido una trayectoria basada en la confianza, la transparencia y la dedicación a cada cliente.
-              </p>
-              <p className="text-brand-dark/60 leading-relaxed">
-                Nuestro compromiso va más allá de la transacción: nos involucramos en cada etapa del proceso para que la experiencia sea clara, segura y satisfactoria.
-              </p>
-            </div>
-
-            <div
-              className="aspect-[4/5] bg-cover bg-center"
-              style={{ backgroundImage: "url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80')" }}
-            />
+      <section className="studio-manifesto">
+        <div className="section-shell studio-manifesto__layout">
+          <p className="eyebrow">Nuestra manera de trabajar</p>
+          <h2>
+            No empezamos por los metros cuadrados. Empezamos por hacer las
+            preguntas correctas.
+          </h2>
+          <div className="studio-manifesto__body">
+            <p>
+              Boetto nació con una convicción simple: una decisión inmobiliaria
+              importante merece tiempo, contexto y una conversación honesta. Por
+              eso trabajamos con una selección cuidada y no con inventarios
+              interminables.
+            </p>
+            <p>
+              Leemos cada propiedad por su arquitectura, su entorno y su valor
+              futuro. Después traducimos esa información de forma clara, para que
+              nuestros clientes puedan avanzar sin presión y con mejores razones.
+            </p>
           </div>
         </div>
       </section>
 
-      <section className="py-20 bg-brand-cream">
-        <div className="container-wide">
-          <h2 className="text-2xl font-serif font-medium text-brand-dark text-center mb-12">Nuestros valores</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Confianza",
-                description: "Construimos relaciones duraderas basadas en la honestidad y la transparencia en cada operación.",
-              },
-              {
-                title: "Profesionalismo",
-                description: "Abordamos cada consulta con el máximo rigor profesional, brindando asesoramiento experto y actualizado.",
-              },
-              {
-                title: "Cercanía",
-                description: "Entendemos que detrás de cada propiedad hay una historia. Te acompañamos con atención personalizada.",
-              },
-            ].map((value) => (
-              <div key={value.title} className="bg-brand-surface border border-brand-warm-gray/30 p-8">
-                <h3 className="text-lg font-serif font-medium text-brand-dark mb-3">{value.title}</h3>
-                <p className="text-sm text-brand-dark/60 leading-relaxed">{value.description}</p>
-              </div>
+      <section className="studio-principles">
+        <div className="section-shell">
+          <div className="studio-principles__heading">
+            <p className="eyebrow">Lo que cuidamos</p>
+            <h2>La confianza se construye en los detalles.</h2>
+          </div>
+          <div className="studio-principles__grid">
+            {principles.map((principle) => (
+              <article key={principle.title}>
+                <i aria-hidden="true" />
+                <h3>{principle.title}</h3>
+                <p>{principle.text}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container-wide text-center">
-          <h2 className="text-2xl font-serif font-medium text-brand-dark mb-4">¿Listo para dar el próximo paso?</h2>
-          <p className="text-brand-dark/60 mb-8 max-w-lg mx-auto">
-            Ya sea que busques comprar, vender, alquilar o tasar, estamos para ayudarte.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/propiedades" className="px-8 py-3.5 bg-brand-sage text-white text-sm font-medium tracking-wide hover:bg-brand-sage-dark transition-colors">
-              Ver propiedades
-            </Link>
-            <Link href="/contacto" className="px-8 py-3.5 border border-brand-warm-gray text-brand-dark text-sm font-medium tracking-wide hover:bg-brand-sage hover:text-white hover:border-brand-sage transition-colors">
-              Contactanos
+      <section className="studio-closing">
+        <div className="section-shell studio-closing__panel">
+          <Image
+            src="/images/boetto-service-family-guidance.png"
+            alt="Asesora de Boetto conversando con una pareja"
+            fill
+            sizes="(max-width: 900px) 100vw, 94vw"
+            className="studio-closing__image"
+          />
+          <div className="studio-closing__veil" />
+          <div className="studio-closing__copy">
+            <p className="eyebrow eyebrow--light">La próxima conversación</p>
+            <h2>Tu búsqueda merece una mirada atenta desde el inicio.</h2>
+            <Link href="/contacto" className="outline-link outline-link--light">
+              Conocernos
+              <span aria-hidden="true">→</span>
             </Link>
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
