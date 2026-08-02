@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ContactForm from "@/components/forms/ContactForm";
@@ -13,10 +14,10 @@ const heroChapters = [
     title: (
       <>
         Una propiedad se elige
-        <em>por como se vive.</em>
+        <em>por cómo se vive.</em>
       </>
     ),
-    text: "El recorrido acompana una idea simple: antes de mostrar opciones, entendemos la vida que queres construir.",
+    text: "El recorrido acompaña una idea simple: antes de mostrar opciones, entendemos la vida que querés construir.",
   },
   {
     key: "busqueda",
@@ -26,7 +27,7 @@ const heroChapters = [
         <em>tu forma de habitar.</em>
       </>
     ),
-    text: "Rutinas, luz, tiempos, expansion y entorno. La busqueda empieza con preguntas precisas, no con una lista infinita.",
+    text: "Rutinas, luz, tiempos, expansión y entorno. La búsqueda empieza con preguntas precisas, no con una lista infinita.",
   },
   {
     key: "contexto",
@@ -36,17 +37,17 @@ const heroChapters = [
         <em>antes que los metros.</em>
       </>
     ),
-    text: "Orientacion, accesos, arquitectura y valor futuro nos permiten seleccionar menos opciones y compararlas con mas criterio.",
+    text: "Orientación, accesos, arquitectura y valor futuro nos permiten seleccionar menos opciones y compararlas con más criterio.",
   },
   {
     key: "formulario",
     title: (
       <>
         Empecemos por
-        <em>lo que necesitas.</em>
+        <em>lo que necesitás.</em>
       </>
     ),
-    text: "Elegi una operacion, una zona y el tipo de propiedad. Nosotros hacemos el resto con criterio.",
+    text: "Elegí una operación, una zona y el tipo de propiedad. Nosotros hacemos el resto con criterio.",
     search: true,
   },
 ];
@@ -54,7 +55,7 @@ const heroChapters = [
 const mobileHeroQuery = "(max-width: 900px)";
 
 const locationOptions = [
-  { place: "Agronomia", context: "Capital Federal" },
+  { place: "Agronomía", context: "Capital Federal" },
   { place: "Almagro", context: "Capital Federal" },
   { place: "Balvanera", context: "Capital Federal" },
   { place: "Barracas", context: "Capital Federal" },
@@ -64,7 +65,7 @@ const locationOptions = [
   { place: "Chacarita", context: "Capital Federal" },
   { place: "Coghlan", context: "Capital Federal" },
   { place: "Colegiales", context: "Capital Federal" },
-  { place: "Constitucion", context: "Capital Federal" },
+  { place: "Constitución", context: "Capital Federal" },
   { place: "Flores", context: "Capital Federal" },
   { place: "Floresta", context: "Capital Federal" },
   { place: "La Boca", context: "Capital Federal" },
@@ -84,10 +85,10 @@ const locationOptions = [
   { place: "Recoleta", context: "Capital Federal" },
   { place: "Retiro", context: "Capital Federal" },
   { place: "Saavedra", context: "Capital Federal" },
-  { place: "San Cristobal", context: "Capital Federal" },
-  { place: "San Nicolas", context: "Capital Federal" },
+  { place: "San Cristóbal", context: "Capital Federal" },
+  { place: "San Nicolás", context: "Capital Federal" },
   { place: "San Telmo", context: "Capital Federal" },
-  { place: "Velez Sarsfield", context: "Capital Federal" },
+  { place: "Vélez Sarsfield", context: "Capital Federal" },
   { place: "Versalles", context: "Capital Federal" },
   { place: "Villa Crespo", context: "Capital Federal" },
   { place: "Villa del Parque", context: "Capital Federal" },
@@ -95,8 +96,8 @@ const locationOptions = [
   { place: "Villa General Mitre", context: "Capital Federal" },
   { place: "Villa Lugano", context: "Capital Federal" },
   { place: "Villa Luro", context: "Capital Federal" },
-  { place: "Villa Ortuzar", context: "Capital Federal" },
-  { place: "Villa Pueyrredon", context: "Capital Federal" },
+  { place: "Villa Ortúzar", context: "Capital Federal" },
+  { place: "Villa Pueyrredón", context: "Capital Federal" },
   { place: "Villa Real", context: "Capital Federal" },
   { place: "Villa Riachuelo", context: "Capital Federal" },
   { place: "Villa Santa Rita", context: "Capital Federal" },
@@ -115,20 +116,20 @@ const propertyTypes = [
 
 const services = [
   {
-    title: "Busqueda guiada",
-    text: "Traducimos prioridades reales, tiempos y estilo de vida en una seleccion breve, familiar y bien acompaniada.",
+    title: "Búsqueda guiada",
+    text: "Traducimos prioridades reales, tiempos y estilo de vida en una selección breve, familiar y bien acompañada.",
     image: "/images/boetto-service-family-guidance.png",
     alt: "Asesora inmobiliaria conversando con una pareja en un living luminoso",
   },
   {
     title: "Contexto y claridad",
-    text: "Ordenamos zonas, tipologias y presupuesto para que cada decision se sienta cercana, posible y bien cuidada.",
+    text: "Ordenamos zonas, tipologías y presupuesto para que cada decisión se sienta cercana, posible y bien cuidada.",
     image: "/images/boetto-service-family-context.png",
-    alt: "Familia recorriendo una casa calida junto a una asesora inmobiliaria",
+    alt: "Familia recorriendo una casa cálida junto a una asesora inmobiliaria",
   },
   {
     title: "Visitas con calma",
-    text: "Seleccionamos propiedades para visitar con informacion precisa, sensibilidad humana y foco en lo que importa.",
+    text: "Seleccionamos propiedades para visitar con información precisa, sensibilidad humana y foco en lo que importa.",
     image: "/images/boetto-service-family-visit.png",
     alt: "Matrimonio y su hijo visitando una vivienda luminosa en Capital Federal",
   },
@@ -151,7 +152,13 @@ function SearchIcon() {
   );
 }
 
-export default function HomeExperience() {
+interface HomeExperienceProps {
+  featuredProperties: ReactNode;
+}
+
+export default function HomeExperience({
+  featuredProperties,
+}: HomeExperienceProps) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const heroRef = useRef<HTMLElement | null>(null);
@@ -374,7 +381,7 @@ export default function HomeExperience() {
                   <p className="scroll-hero__lead">{chapter.text}</p>
                   {chapter.search && (
                     <form className="hero-search" onSubmit={handleSearch} id="buscar">
-                    <div className="hero-search__modes" aria-label="Tipo de operacion">
+                    <div className="hero-search__modes" aria-label="Tipo de operación">
                       {[
                         ["venta", "Comprar"],
                         ["alquiler", "Alquilar"],
@@ -393,13 +400,13 @@ export default function HomeExperience() {
 
                     <div className="hero-search__bar">
                       <div className="hero-search__location">
-                        <label htmlFor="hero-location">Ubicacion</label>
+                        <label htmlFor="hero-location">Ubicación</label>
                         <input
                           id="hero-location"
                           name="city"
                           type="text"
                           value={locationQuery}
-                          placeholder="¿Donde queres mudarte?"
+                          placeholder="¿Dónde querés mudarte?"
                           autoComplete="off"
                           onChange={(event) => {
                             setLocationQuery(event.target.value);
@@ -481,18 +488,18 @@ export default function HomeExperience() {
         <div className="section-shell closing-panel" data-reveal>
           <div className="closing-panel__copy">
             <div>
-              <h2>Una busqueda bien acompañada empieza mucho antes de una visita.</h2>
+              <h2>Una búsqueda bien acompañada empieza mucho antes de una visita.</h2>
             </div>
 
             <div className="closing-panel__body">
               <p>
-                Contanos que queres cambiar, donde imaginas tu proxima etapa y
-                cuales son tus prioridades. Nosotros convertimos esa intencion en
-                una busqueda concreta.
+                Contanos qué querés cambiar, dónde imaginás tu próxima etapa y
+                cuáles son tus prioridades. Nosotros convertimos esa intención en
+                una búsqueda concreta.
               </p>
               <div className="closing-panel__actions">
                 <Link href="/contacto" className="closing-panel__primary">
-                  Coordinar proxima visita
+                  Coordinar próxima visita
                   <ArrowIcon />
                 </Link>
                 <a href={`mailto:${COMPANY_INFO.email}`}>{COMPANY_INFO.email}</a>
@@ -514,10 +521,12 @@ export default function HomeExperience() {
         </div>
       </section>
 
+      {featuredProperties}
+
       <section className="agency-section agency-section--services">
         <div className="section-shell agency-grid">
           <div className="agency-grid__headline" data-reveal>
-            <h2>Informacion precisa para decidir con calma.</h2>
+            <h2>Información precisa para decidir con calma.</h2>
           </div>
 
           <div className="service-list">
@@ -544,16 +553,16 @@ export default function HomeExperience() {
       <section className="agency-section agency-section--form" id="contacto">
         <div className="section-shell contact-layout">
           <div className="contact-layout__intro" data-reveal>
-            <h2>Hablemos de tu proxima decision.</h2>
+            <h2>Hablemos de tu próxima decisión.</h2>
             <p>
-              Dejanos tus datos y una breve idea de lo que necesitas. El equipo
-              de Boetto te responde con una primera orientacion concreta.
+              Dejanos tus datos y una breve idea de lo que necesitás. El equipo
+              de Boetto te responde con una primera orientación concreta.
             </p>
             <a href={`mailto:${COMPANY_INFO.email}`}>{COMPANY_INFO.email}</a>
           </div>
           <div className="contact-layout__form" data-reveal>
             <p className="contact-layout__form-label">
-              Contanos que estas buscando
+              Contanos qué estás buscando
             </p>
             <ContactForm variant="editorial" />
           </div>

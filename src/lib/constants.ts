@@ -37,7 +37,7 @@ export const COMPANY_INFO = {
   phoneHref: "+541145632384",
   email: "info@boettopropiedades.com",
   instagram: "boettopropiedades",
-  address: "Carlos Antonio Lopez 3483, Capital Federal",
+  address: "Carlos Antonio López 3483, Capital Federal",
   hours: "Lunes a viernes de 10:00 a 19:00 hrs",
   website: "https://boettopropiedades.com",
 } as const;

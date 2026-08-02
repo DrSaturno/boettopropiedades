@@ -44,8 +44,8 @@ export default function Footer() {
         </div>
 
         <div className="footer-modern__nav">
-          <p className="footer-label">Navegacion</p>
-          <nav aria-label="Navegacion principal">
+          <p className="footer-label">Navegación</p>
+          <nav aria-label="Navegación principal">
             {navigation.map(([label, href]) => (
               <Link href={href} key={href}>
                 {label}
@@ -98,7 +98,7 @@ export default function Footer() {
             By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
           </a>
         </span>
-        <span>Privacidad · Terminos</span>
+        <span>Privacidad · Términos</span>
       </div>
     </footer>
   );
