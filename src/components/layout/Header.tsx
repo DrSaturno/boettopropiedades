@@ -9,6 +9,8 @@ const links = [
   { href: "/propiedades?operation=venta", label: "Comprar" },
   { href: "/propiedades?operation=alquiler", label: "Alquilar" },
   { href: "/tasaciones", label: "Vender" },
+  { href: "/nosotros", label: "Estudio" },
+  { href: "/contacto", label: "Contacto" },
 ];
 
 export default function Header() {
@@ -50,6 +52,17 @@ export default function Header() {
     };
   }, [pathname]);
 
+  useEffect(() => {
+    if (!open) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
+
   const materialized = pathname !== "/" || scrolled;
 
   return (
@@ -63,8 +76,8 @@ export default function Header() {
           className="site-header__logo-image site-header__logo-image--light"
           src="/logos/logo-white.svg"
           alt="Boetto Propiedades"
-          width={220}
-          height={52}
+          fill
+          sizes="(max-width: 900px) 146px, 164px"
           preload
         />
         <Image
@@ -72,8 +85,9 @@ export default function Header() {
           src="/logos/logo-black.svg"
           alt=""
           aria-hidden="true"
-          width={220}
-          height={52}
+          fill
+          sizes="(max-width: 900px) 146px, 164px"
+          loading="eager"
         />
       </Link>
 

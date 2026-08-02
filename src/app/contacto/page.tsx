@@ -1,83 +1,117 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import Image from "next/image";
 import ContactForm from "@/components/forms/ContactForm";
 import { COMPANY_INFO } from "@/lib/constants";
 import { getWhatsAppUrl } from "@/lib/utils";
-import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Contacto",
-  description: "Contactá a Boetto Propiedades. Estamos para ayudarte con tu próxima operación inmobiliaria.",
+  description:
+    "Hablemos sobre tu próxima decisión inmobiliaria en Capital Federal.",
 };
 
 export default function ContactoPage() {
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen">
-      {/* Left side: Image */}
-      <div className="lg:w-1/2 relative h-[40vh] lg:h-auto">
-        <Image
-          src="/images/contact_bg.jpg"
-          alt="Boetto Contacto"
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* Subtle overlay for elegance */}
-        <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
-      </div>
+    <div className="inner-page contact-page">
+      <section className="contact-masthead">
+        <div className="contact-masthead__visual">
+          <Image
+            src="/images/boetto-courtyard.png"
+            alt="Casa contemporánea iluminada al atardecer"
+            fill
+            priority
+            sizes="100vw"
+            className="contact-masthead__image"
+          />
+          <div className="contact-masthead__veil" />
+        </div>
 
-      {/* Right side: Form & Info */}
-      <div className="lg:w-1/2 bg-brand-cream py-20 px-8 lg:px-16 xl:px-24 flex flex-col justify-center">
-        <div className="max-w-xl w-full mx-auto">
-          
-          <div className="mb-12">
-            <p className="text-brand-sage text-xs uppercase tracking-[0.2em] mb-4 font-semibold">
-              Contacto
+        <div className="contact-masthead__content">
+          <p className="eyebrow eyebrow--light">Contacto</p>
+          <h1>
+            Hablemos.
+            <em>Lo que sigue empieza por una conversación.</em>
+          </h1>
+          <p>
+            Comprar, vender o tasar una propiedad empieza por ordenar el contexto.
+            Contanos qué necesitás y te respondemos con una primera orientación
+            concreta.
+          </p>
+          <a href="#consulta" className="contact-masthead__link">
+            Iniciar una conversación
+            <span aria-hidden="true">↓</span>
+          </a>
+        </div>
+
+        <p className="contact-masthead__aside" aria-hidden="true">
+          Servicio inmobiliario · Capital Federal
+        </p>
+      </section>
+
+      <section className="contact-conversation" id="consulta">
+        <div className="section-shell contact-conversation__layout">
+          <div className="contact-conversation__intro">
+            <p className="eyebrow">Primera conversación</p>
+            <h2>Empecemos por tu contexto.</h2>
+            <p>
+              Dejanos tus datos y una breve idea de lo que estás buscando. Una
+              persona del equipo va a leer tu consulta y responderte personalmente.
             </p>
-            <h1 className="text-4xl md:text-5xl font-serif font-medium text-brand-dark mb-4">
-              Hablemos de tu próxima decisión.
-            </h1>
-            <p className="text-brand-dark/70 text-sm leading-relaxed">
-              Dejanos tus datos y una breve idea de lo que necesitas. El equipo
-              de Boetto te responde con una primera orientación concreta.
-            </p>
-          </div>
 
-          <div className="mb-12">
-            <ContactForm variant="default" />
-          </div>
-
-          <div className="pt-12 border-t border-brand-dark/10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <p className="text-xs uppercase tracking-widest text-brand-dark/50 mb-2">Dirección</p>
-                <p className="text-sm text-brand-dark">{COMPANY_INFO.address}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-widest text-brand-dark/50 mb-2">Contacto</p>
-                <a href={`tel:${COMPANY_INFO.phoneHref}`} className="block text-sm text-brand-dark hover:text-brand-sage transition-colors mb-1">
-                  {COMPANY_INFO.phone}
-                </a>
-                <a href={`mailto:${COMPANY_INFO.email}`} className="block text-sm text-brand-dark hover:text-brand-sage transition-colors">
-                  {COMPANY_INFO.email}
-                </a>
-              </div>
+            <div className="contact-conversation__channels">
+              <a href={`tel:${COMPANY_INFO.phoneHref}`}>
+                <span>Teléfono</span>
+                <strong>{COMPANY_INFO.phone}</strong>
+              </a>
+              <a href={`mailto:${COMPANY_INFO.email}`}>
+                <span>Email</span>
+                <strong>{COMPANY_INFO.email}</strong>
+              </a>
+              <a
+                href={getWhatsAppUrl(
+                  "Hola, me comunico desde la web de Boetto Propiedades."
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>WhatsApp</span>
+                <strong>Escribir ahora ↗</strong>
+              </a>
             </div>
-            
+          </div>
+
+          <div className="contact-conversation__form">
+            <div className="contact-conversation__form-heading">
+              <span>Tu consulta</span>
+              <p>Respondemos de manera personal, sin mensajes automáticos.</p>
+            </div>
+            <ContactForm variant="dark" showLabels />
+          </div>
+        </div>
+      </section>
+
+      <section className="contact-details">
+        <div className="section-shell contact-details__grid">
+          <div>
+            <span>Estudio</span>
+            <p>{COMPANY_INFO.address}</p>
+          </div>
+          <div>
+            <span>Horarios</span>
+            <p>{COMPANY_INFO.hours}</p>
+          </div>
+          <div>
+            <span>Instagram</span>
             <a
-              href={getWhatsAppUrl("Hola, me comunico desde la web de Boetto Propiedades.")}
+              href={`https://www.instagram.com/${COMPANY_INFO.instagram}/`}
               target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 pb-2 border-b border-[#25D366]/50 text-[#25D366] text-sm font-medium hover:border-[#25D366] transition-colors mt-8"
+              rel="noreferrer"
             >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-              </svg>
-              Chat de WhatsApp
+              @{COMPANY_INFO.instagram} ↗
             </a>
           </div>
-
         </div>
-      </div>
+      </section>
     </div>
   );
 }
