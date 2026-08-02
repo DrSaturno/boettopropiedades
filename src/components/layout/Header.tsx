@@ -9,7 +9,6 @@ const links = [
   { href: "/propiedades?operation=venta", label: "Comprar" },
   { href: "/propiedades?operation=alquiler", label: "Alquilar" },
   { href: "/tasaciones", label: "Vender" },
-  { href: "/nosotros", label: "Estudio" },
   { href: "/contacto", label: "Contacto" },
 ];
 

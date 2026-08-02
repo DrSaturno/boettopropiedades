@@ -1,36 +1,57 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useRouter } from "next/navigation";
+import type { FormEvent } from "react";
 import { OPERATIONS, PROPERTY_TYPES } from "@/lib/constants";
 
-export default function PropertyFilters() {
+interface PropertyFiltersProps {
+  initialOperation?: string;
+  initialPropertyType?: string;
+  initialCity?: string;
+  initialBedrooms?: string;
+  initialMaxPrice?: string;
+}
+
+export default function PropertyFilters({
+  initialOperation = "",
+  initialPropertyType = "",
+  initialCity = "",
+  initialBedrooms = "",
+  initialMaxPrice = "",
+}: PropertyFiltersProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const updateFilter = useCallback(
-    (key: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const params = new URLSearchParams();
+
+    for (const key of [
+      "operation",
+      "propertyType",
+      "city",
+      "bedrooms",
+      "maxPrice",
+    ]) {
+      const value = form.get(key)?.toString().trim();
       if (value) params.set(key, value);
-      else params.delete(key);
-      router.push(`/propiedades?${params.toString()}`);
-    },
-    [router, searchParams]
-  );
+    }
 
-  const rawPropertyType = searchParams.get("propertyType") || "";
-  const multiplePropertyTypes = rawPropertyType.includes(",");
+    router.push(`/propiedades?${params.toString()}`);
+  }
+
+  const multiplePropertyTypes = initialPropertyType.includes(",");
 
   return (
-    <div className="catalog-filters" aria-label="Filtros de propiedades">
+    <form
+      className="catalog-filters"
+      aria-label="Buscar propiedades"
+      onSubmit={handleSubmit}
+    >
       <div className="catalog-filters__grid">
         <label>
           <span>Operación</span>
-          <select
-            value={searchParams.get("operation") || ""}
-            onChange={(event) => updateFilter("operation", event.target.value)}
-          >
+          <select name="operation" defaultValue={initialOperation}>
             <option value="">Todas</option>
             {OPERATIONS.map((operation) => (
               <option key={operation.value} value={operation.value}>
@@ -42,15 +63,10 @@ export default function PropertyFilters() {
 
         <label>
           <span>Tipo</span>
-          <select
-            value={rawPropertyType}
-            onChange={(event) =>
-              updateFilter("propertyType", event.target.value)
-            }
-          >
+          <select name="propertyType" defaultValue={initialPropertyType}>
             <option value="">Todos</option>
             {multiplePropertyTypes ? (
-              <option value={rawPropertyType}>Varios tipos</option>
+              <option value={initialPropertyType}>Varios tipos</option>
             ) : null}
             {PROPERTY_TYPES.map((type) => (
               <option key={type.value} value={type.value}>
@@ -63,59 +79,27 @@ export default function PropertyFilters() {
         <label>
           <span>Ubicación</span>
           <input
-            key={searchParams.get("city") || "all-locations"}
+            name="city"
             type="text"
-            placeholder="Barrio o zona"
-            defaultValue={searchParams.get("city") || ""}
-            onBlur={(event) => updateFilter("city", event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                updateFilter("city", event.currentTarget.value);
-              }
-            }}
+            placeholder="Barrio, zona o calle"
+            defaultValue={initialCity}
           />
         </label>
 
         <label>
-          <span>Precio desde</span>
+          <span>Hasta USD</span>
           <input
-            key={searchParams.get("minPrice") || "no-minimum"}
+            name="maxPrice"
             type="number"
             min="0"
-            placeholder="Sin mínimo"
-            defaultValue={searchParams.get("minPrice") || ""}
-            onBlur={(event) => updateFilter("minPrice", event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                updateFilter("minPrice", event.currentTarget.value);
-              }
-            }}
-          />
-        </label>
-
-        <label>
-          <span>Precio hasta</span>
-          <input
-            key={searchParams.get("maxPrice") || "no-maximum"}
-            type="number"
-            min="0"
-            placeholder="Sin máximo"
-            defaultValue={searchParams.get("maxPrice") || ""}
-            onBlur={(event) => updateFilter("maxPrice", event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                updateFilter("maxPrice", event.currentTarget.value);
-              }
-            }}
+            placeholder="Sin límite"
+            defaultValue={initialMaxPrice}
           />
         </label>
 
         <label>
           <span>Dormitorios</span>
-          <select
-            value={searchParams.get("bedrooms") || ""}
-            onChange={(event) => updateFilter("bedrooms", event.target.value)}
-          >
+          <select name="bedrooms" defaultValue={initialBedrooms}>
             <option value="">Todos</option>
             {[1, 2, 3, 4, 5].map((number) => (
               <option key={number} value={number}>
@@ -124,12 +108,15 @@ export default function PropertyFilters() {
             ))}
           </select>
         </label>
-      </div>
 
-      <Link href="/propiedades" className="catalog-filters__reset">
-        Limpiar filtros
-        <span aria-hidden="true">×</span>
-      </Link>
-    </div>
+        <button type="submit" className="catalog-filters__submit">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <circle cx="10.8" cy="10.8" r="6.8" />
+            <path d="m16 16 5 5" />
+          </svg>
+          <span>Buscar</span>
+        </button>
+      </div>
+    </form>
   );
 }

@@ -24,14 +24,6 @@ export default function PropertyCard({ property }: Props) {
           aria-label={`Vista de ${property.title}`}
         />
         <div className="property-card__veil" />
-        <div className="property-card__badges">
-          <span>{property.operation === "venta" ? "Venta" : "Alquiler"}</span>
-          {property.externalSource === "demo" ? (
-            <span>Ejemplo ficticio</span>
-          ) : property.featured ? (
-            <span>Selección Boetto</span>
-          ) : null}
-        </div>
         <span className="property-card__open" aria-hidden="true">
           ↗
         </span>
@@ -39,12 +31,11 @@ export default function PropertyCard({ property }: Props) {
 
       <div className="property-card__body">
         <div className="property-card__heading">
-          <div>
-            <p>{location}</p>
-            <h3>{property.title}</h3>
-          </div>
+          <h3>{property.title}</h3>
           <strong>{formatPrice(property.price, property.currency)}</strong>
         </div>
+
+        <p className="property-card__location">{location}</p>
 
         <div className="property-card__facts">
           {property.bedrooms != null && property.bedrooms > 0 ? (
@@ -64,7 +55,7 @@ export default function PropertyCard({ property }: Props) {
         </div>
 
         <span className="property-card__link">
-          Ver ficha
+          Ver propiedad
           <i aria-hidden="true">→</i>
         </span>
       </div>

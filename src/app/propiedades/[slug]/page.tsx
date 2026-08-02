@@ -12,7 +12,7 @@ import {
   getWhatsAppUrl,
   getPropertyWhatsAppMessage,
 } from "@/lib/utils";
-import { PROPERTY_TYPES, OPERATIONS } from "@/lib/constants";
+import { PROPERTY_TYPES } from "@/lib/constants";
 import PropertyGallery from "@/components/properties/PropertyGallery";
 import ContactForm from "@/components/forms/ContactForm";
 import PropertyCard from "@/components/properties/PropertyCard";
@@ -51,7 +51,6 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   const images = property.images;
   const amenities = property.amenities;
-  const operationLabel = OPERATIONS.find((o) => o.value === property.operation)?.label || property.operation;
   const typeLabel = PROPERTY_TYPES.find((t) => t.value === property.propertyType)?.label || property.propertyType;
 
   const related = await getRelatedCatalogProperties(property, demoMode);
@@ -77,25 +76,6 @@ export default async function PropertyDetailPage({ params }: Props) {
               <PropertyGallery images={images} title={property.title} />
 
               <div>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="px-3 py-1 bg-brand-accent-dark text-white text-xs uppercase tracking-wider font-medium">
-                    {operationLabel}
-                  </span>
-                  <span className="px-3 py-1 bg-brand-cream text-brand-dark text-xs uppercase tracking-wider font-medium">
-                    {typeLabel}
-                  </span>
-                  {property.featured && (
-                    <span className="px-3 py-1 bg-brand-sage text-white text-xs uppercase tracking-wider font-medium">
-                      Destacada
-                    </span>
-                  )}
-                  {demoMode && (
-                    <span className="px-3 py-1 bg-brand-dark text-white text-xs uppercase tracking-wider font-medium">
-                      Ejemplo ficticio
-                    </span>
-                  )}
-                </div>
-
                 <h1 className="text-2xl md:text-3xl font-serif font-medium text-brand-dark mb-2">
                   {property.title}
                 </h1>

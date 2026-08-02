@@ -27,7 +27,6 @@ export default function ContactoPage() {
         </div>
 
         <div className="contact-masthead__content">
-          <p className="eyebrow eyebrow--light">Contacto</p>
           <h1>
             Hablemos.
             <em>Lo que sigue empieza por una conversación.</em>
@@ -51,7 +50,6 @@ export default function ContactoPage() {
       <section className="contact-conversation" id="consulta">
         <div className="section-shell contact-conversation__layout">
           <div className="contact-conversation__intro">
-            <p className="eyebrow">Primera conversación</p>
             <h2>Empecemos por tu contexto.</h2>
             <p>
               Dejanos tus datos y una breve idea de lo que estás buscando. Una
@@ -93,7 +91,7 @@ export default function ContactoPage() {
       <section className="contact-details">
         <div className="section-shell contact-details__grid">
           <div>
-            <span>Estudio</span>
+            <span>Oficina</span>
             <p>{COMPANY_INFO.address}</p>
           </div>
           <div>
