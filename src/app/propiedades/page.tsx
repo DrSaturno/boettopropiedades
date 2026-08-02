@@ -1,11 +1,9 @@
 import { Metadata } from "next";
 import { Suspense } from "react";
-import { prisma } from "@/lib/prisma";
-import { parseJsonField } from "@/lib/utils";
 import PropertyFilters from "@/components/properties/PropertyFilters";
 import PropertyGrid from "@/components/properties/PropertyGrid";
 import InteriorHero from "@/components/layout/InteriorHero";
-import { Prisma } from "@prisma/client";
+import { getPublicPropertyCatalog } from "@/lib/property-catalog";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -18,59 +16,22 @@ interface Props {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-async function getPublishedProperties(where: Prisma.PropertyWhereInput) {
-  try {
-    const properties = await prisma.property.findMany({
-      where,
-      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-    });
-
-    return { properties, unavailable: false };
-  } catch (error) {
-    console.error("[properties] Unable to load the property catalog", error);
-    return { properties: [], unavailable: true };
-  }
-}
-
 export default async function PropertiesPage({ searchParams }: Props) {
   const params = await searchParams;
-
-  const where: Prisma.PropertyWhereInput = { status: "published" };
-
-  if (params.operation) where.operation = String(params.operation);
-  if (params.propertyType) {
-    const propertyTypes = String(params.propertyType)
-      .split(",")
-      .map((value) => value.trim())
-      .filter(Boolean);
-
-    where.propertyType =
-      propertyTypes.length > 1 ? { in: propertyTypes } : propertyTypes[0];
-  }
-  if (params.city) {
-    const city = String(params.city);
-    where.OR = [
-      { city: { contains: city } },
-      { neighborhood: { contains: city } },
-      { address: { contains: city } },
-    ];
-  }
-  if (params.minPrice || params.maxPrice) {
-    where.price = {};
-    if (params.minPrice) where.price.gte = Number(params.minPrice);
-    if (params.maxPrice) where.price.lte = Number(params.maxPrice);
-  }
-  if (params.bedrooms) where.bedrooms = { gte: Number(params.bedrooms) };
-
-  const { properties, unavailable } = await getPublishedProperties(where);
-
-  const mapped = properties.map((p) => ({
-    ...p,
-    images: parseJsonField<string[]>(p.images, []),
-    amenities: parseJsonField<string[]>(p.amenities, []),
-    createdAt: p.createdAt.toISOString(),
-    updatedAt: p.updatedAt.toISOString(),
-  }));
+  const propertyTypes = params.propertyType
+    ? String(params.propertyType)
+        .split(",")
+        .map((value) => value.trim())
+        .filter(Boolean)
+    : undefined;
+  const { properties, demoMode } = await getPublicPropertyCatalog({
+    operation: params.operation ? String(params.operation) : undefined,
+    propertyTypes,
+    city: params.city ? String(params.city) : undefined,
+    minPrice: params.minPrice ? Number(params.minPrice) : undefined,
+    maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
+    bedrooms: params.bedrooms ? Number(params.bedrooms) : undefined,
+  });
 
   return (
     <div className="inner-page properties-page">
@@ -106,30 +67,17 @@ export default async function PropertiesPage({ searchParams }: Props) {
             <PropertyFilters />
           </Suspense>
 
-          {unavailable ? (
-            <div className="catalog-message" role="status">
-              <p className="eyebrow">Catálogo temporalmente no disponible</p>
-              <h2>
-                Estamos actualizando el catálogo
-              </h2>
-              <p>
-                Las propiedades van a volver a estar disponibles en breve. Mientras
-                tanto, podés escribirnos desde la sección de contacto para contarnos
-                qué estás buscando.
-              </p>
-              <Link href="/contacto">Contarnos qué buscás</Link>
-            </div>
-          ) : (
-            <>
-              <div className="catalog-results__header" aria-live="polite">
-                <p>
-                  {mapped.length} propiedad{mapped.length !== 1 ? "es" : ""}
-                </p>
-                <span>Ordenadas por relevancia</span>
-              </div>
-              <PropertyGrid properties={mapped} />
-            </>
-          )}
+          <div className="catalog-results__header" aria-live="polite">
+            <p>
+              {properties.length} propiedad{properties.length !== 1 ? "es" : ""}
+            </p>
+            <span>
+              {demoMode
+                ? "Ejemplos ficticios para visualizar el catálogo"
+                : "Ordenadas por relevancia"}
+            </span>
+          </div>
+          <PropertyGrid properties={properties} />
         </div>
       </section>
 

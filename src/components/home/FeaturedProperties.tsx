@@ -1,14 +1,9 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 import PropertyCard from "@/components/properties/PropertyCard";
-import { parseJsonField } from "@/lib/utils";
+import { getFeaturedCatalogProperties } from "@/lib/property-catalog";
 
 export default async function FeaturedProperties() {
-  const properties = await prisma.property.findMany({
-    where: { status: "published", featured: true },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-  });
+  const properties = await getFeaturedCatalogProperties();
 
   if (properties.length === 0) return null;
 
@@ -39,13 +34,7 @@ export default async function FeaturedProperties() {
           {properties.map((property) => (
             <PropertyCard
               key={property.id}
-              property={{
-                ...property,
-                images: parseJsonField<string[]>(property.images, []),
-                amenities: parseJsonField<string[]>(property.amenities, []),
-                createdAt: property.createdAt.toISOString(),
-                updatedAt: property.updatedAt.toISOString(),
-              }}
+              property={property}
             />
           ))}
         </div>

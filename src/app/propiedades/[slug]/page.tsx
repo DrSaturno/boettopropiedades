@@ -1,8 +1,17 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { formatPrice, formatArea, parseJsonField, getWhatsAppUrl, getPropertyWhatsAppMessage } from "@/lib/utils";
+import { DEMO_PROPERTIES } from "@/data/demo-properties";
+import {
+  getCatalogPropertyBySlug,
+  getRelatedCatalogProperties,
+} from "@/lib/property-catalog";
+import {
+  formatPrice,
+  formatArea,
+  getWhatsAppUrl,
+  getPropertyWhatsAppMessage,
+} from "@/lib/utils";
 import { PROPERTY_TYPES, OPERATIONS } from "@/lib/constants";
 import PropertyGallery from "@/components/properties/PropertyGallery";
 import ContactForm from "@/components/forms/ContactForm";
@@ -12,47 +21,40 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export function generateStaticParams() {
+  return DEMO_PROPERTIES.map(({ slug }) => ({ slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const property = await prisma.property.findUnique({ where: { slug } });
+  const { property } = await getCatalogPropertyBySlug(slug);
   if (!property) return { title: "Propiedad no encontrada" };
 
   return {
     title: property.seoTitle || property.title,
     description:
       property.seoDescription ||
-      `${property.title} en ${property.city || "Córdoba"}. ${formatPrice(property.price, property.currency)}.`,
+      `${property.title} en ${property.city || "Capital Federal"}. ${formatPrice(property.price, property.currency)}.`,
     openGraph: {
       title: property.title,
       description: property.description?.slice(0, 160) || "",
-      images: parseJsonField<string[]>(property.images, []).slice(0, 1),
+      images: property.images.slice(0, 1),
     },
   };
 }
 
 export default async function PropertyDetailPage({ params }: Props) {
   const { slug } = await params;
-  const property = await prisma.property.findUnique({ where: { slug } });
+  const { property, demoMode } = await getCatalogPropertyBySlug(slug);
 
-  if (!property || property.status !== "published") notFound();
+  if (!property) notFound();
 
-  const images = parseJsonField<string[]>(property.images, []);
-  const amenities = parseJsonField<string[]>(property.amenities, []);
+  const images = property.images;
+  const amenities = property.amenities;
   const operationLabel = OPERATIONS.find((o) => o.value === property.operation)?.label || property.operation;
   const typeLabel = PROPERTY_TYPES.find((t) => t.value === property.propertyType)?.label || property.propertyType;
 
-  const related = await prisma.property.findMany({
-    where: {
-      status: "published",
-      slug: { not: slug },
-      OR: [
-        { operation: property.operation, city: property.city },
-        { propertyType: property.propertyType },
-      ],
-    },
-    take: 3,
-    orderBy: { createdAt: "desc" },
-  });
+  const related = await getRelatedCatalogProperties(property, demoMode);
 
   const whatsappMsg = getPropertyWhatsAppMessage(property.title, property.slug);
 
@@ -85,6 +87,11 @@ export default async function PropertyDetailPage({ params }: Props) {
                   {property.featured && (
                     <span className="px-3 py-1 bg-brand-sage text-white text-xs uppercase tracking-wider font-medium">
                       Destacada
+                    </span>
+                  )}
+                  {demoMode && (
+                    <span className="px-3 py-1 bg-brand-dark text-white text-xs uppercase tracking-wider font-medium">
+                      Ejemplo ficticio
                     </span>
                   )}
                 </div>
@@ -179,7 +186,11 @@ export default async function PropertyDetailPage({ params }: Props) {
                   <h3 className="text-lg font-serif font-medium text-brand-dark mb-4">
                     Consultá por esta propiedad
                   </h3>
-                  <ContactForm propertyId={property.id} propertyTitle={property.title} type="property" />
+                  <ContactForm
+                    propertyId={demoMode ? undefined : property.id}
+                    propertyTitle={property.title}
+                    type="property"
+                  />
                 </div>
 
                 <a
@@ -209,13 +220,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               {related.map((p) => (
                 <PropertyCard
                   key={p.id}
-                  property={{
-                    ...p,
-                    images: parseJsonField<string[]>(p.images, []),
-                    amenities: parseJsonField<string[]>(p.amenities, []),
-                    createdAt: p.createdAt.toISOString(),
-                    updatedAt: p.updatedAt.toISOString(),
-                  }}
+                  property={p}
                 />
               ))}
             </div>

@@ -26,7 +26,11 @@ export default function PropertyCard({ property }: Props) {
         <div className="property-card__veil" />
         <div className="property-card__badges">
           <span>{property.operation === "venta" ? "Venta" : "Alquiler"}</span>
-          {property.featured ? <span>Selección Boetto</span> : null}
+          {property.externalSource === "demo" ? (
+            <span>Ejemplo ficticio</span>
+          ) : property.featured ? (
+            <span>Selección Boetto</span>
+          ) : null}
         </div>
         <span className="property-card__open" aria-hidden="true">
           ↗
