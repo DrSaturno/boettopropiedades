@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 interface Props {
@@ -16,15 +17,20 @@ export default function PropertyGallery({ images, title }: Props) {
   return (
     <div>
       <div className="relative aspect-[16/9] overflow-hidden bg-brand-cream mb-3">
-        <div
-          className="absolute inset-0 bg-cover bg-center transition-all duration-500"
-          style={{ backgroundImage: `url('${displayImages[activeIndex]}')` }}
+        <Image
+          key={activeIndex}
+          src={displayImages[activeIndex]}
+          alt={`${title} - Imagen ${activeIndex + 1}`}
+          fill
+          sizes="(max-width: 768px) 100vw, 66vw"
+          className="object-cover transition-all duration-500"
+          priority={activeIndex === 0}
         />
         {displayImages.length > 1 && (
           <>
             <button
               onClick={() => setActiveIndex((i) => (i === 0 ? displayImages.length - 1 : i - 1))}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors"
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors z-10"
               aria-label="Anterior"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -33,14 +39,14 @@ export default function PropertyGallery({ images, title }: Props) {
             </button>
             <button
               onClick={() => setActiveIndex((i) => (i === displayImages.length - 1 ? 0 : i + 1))}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors z-10"
               aria-label="Siguiente"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 4.5l7.5 7.5-7.5 7.5" />
               </svg>
             </button>
-            <div className="absolute bottom-4 right-4 px-3 py-1 bg-black/50 text-white text-xs">
+            <div className="absolute bottom-4 right-4 px-3 py-1 bg-black/50 text-white text-xs z-10">
               {activeIndex + 1} / {displayImages.length}
             </div>
           </>
@@ -53,12 +59,20 @@ export default function PropertyGallery({ images, title }: Props) {
             <button
               key={i}
               onClick={() => setActiveIndex(i)}
-              className={`aspect-[4/3] bg-cover bg-center transition-opacity ${
+              className={`relative aspect-[4/3] overflow-hidden transition-opacity ${
                 i === activeIndex ? "ring-2 ring-brand-sage" : "opacity-60 hover:opacity-100"
               }`}
-              style={{ backgroundImage: `url('${img}')` }}
               aria-label={`${title} - Imagen ${i + 1}`}
-            />
+            >
+              <Image
+                src={img}
+                alt={`${title} - miniatura ${i + 1}`}
+                fill
+                sizes="(max-width: 768px) 20vw, 13vw"
+                className="object-cover"
+                loading="lazy"
+              />
+            </button>
           ))}
         </div>
       )}

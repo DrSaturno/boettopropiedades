@@ -3,6 +3,7 @@ import { DM_Sans, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import "./interiors.css";
 import SiteChrome from "@/components/layout/SiteChrome";
+import { OrganizationJsonLd } from "@/components/seo/JsonLd";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -55,6 +56,7 @@ export default function RootLayout({
       className={`${dmSans.variable} ${playfair.variable} antialiased`}
     >
       <body>
+        <OrganizationJsonLd />
         <SiteChrome>{children}</SiteChrome>
       </body>
     </html>

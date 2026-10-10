@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deliverInquiryNotification } from "@/lib/inquiry-notifications";
+import { findOrCreateLead } from "@/lib/crm-service";
 
 export async function POST(request: Request) {
   try {
@@ -27,6 +28,14 @@ export async function POST(request: Request) {
         type: "tasacion",
       },
     });
+
+    findOrCreateLead({
+      inquiryId: inquiry.id,
+      name,
+      email,
+      phone,
+      source: "web",
+    }).catch((err) => console.error("[crm] Error creating lead from tasacion:", err));
 
     const notificationStatus = await deliverInquiryNotification({
       id: inquiry.id,

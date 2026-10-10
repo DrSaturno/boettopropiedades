@@ -91,7 +91,7 @@ export async function getPublicPropertyCatalog(
       where: { status: "published" },
     });
 
-    if (publishedCount >= DEMO_PROPERTIES.length) {
+    if (publishedCount > 0) {
       const properties = await prisma.property.findMany({
         where: {
           status: "published",
@@ -190,7 +190,7 @@ export async function getFeaturedCatalogProperties() {
       where: { status: "published" },
     });
 
-    if (publishedCount >= DEMO_PROPERTIES.length) {
+    if (publishedCount > 0) {
       const properties = await prisma.property.findMany({
         where: { status: "published", featured: true },
         orderBy: { createdAt: "desc" },

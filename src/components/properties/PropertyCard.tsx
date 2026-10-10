@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { PropertyData } from "@/types";
 import { formatArea, formatPrice } from "@/lib/utils";
@@ -17,11 +18,13 @@ export default function PropertyCard({ property }: Props) {
   return (
     <Link href={`/propiedades/${property.slug}`} className="property-card">
       <div className="property-card__media">
-        <div
-          className="property-card__image"
-          style={{ backgroundImage: `url('${mainImage}')` }}
-          role="img"
-          aria-label={`Vista de ${property.title}`}
+        <Image
+          src={mainImage}
+          alt={`Vista de ${property.title}`}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="property-card__image object-cover"
+          loading="lazy"
         />
         <div className="property-card__veil" />
         <span className="property-card__open" aria-hidden="true">

@@ -40,6 +40,7 @@ model Property {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   inquiries      Inquiry[]
+  leads          Lead[]
 }
 
 model Inquiry {
@@ -55,7 +56,38 @@ model Inquiry {
   notificationStatus String    @default("pending")
   notificationError  String?
   notifiedAt         DateTime?
+  leadId             Int?
+  lead               Lead?     @relation(fields: [leadId], references: [id])
   createdAt          DateTime  @default(now())
+}
+
+model Lead {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String
+  phone        String?
+  source       String        @default("web")
+  stage        String        @default("nuevo")
+  priority     String        @default("media")
+  notes        String?
+  assignedTo   String?
+  propertyId   Int?
+  property     Property?     @relation(fields: [propertyId], references: [id])
+  inquiries    Inquiry[]
+  interactions Interaction[]
+  tags         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Interaction {
+  id        Int      @id @default(autoincrement())
+  leadId    Int
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type      String
+  notes     String
+  createdBy String?
+  createdAt DateTime @default(now())
 }
 
 model User {

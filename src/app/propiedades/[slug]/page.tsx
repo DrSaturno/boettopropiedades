@@ -16,6 +16,7 @@ import { PROPERTY_TYPES } from "@/lib/constants";
 import PropertyGallery from "@/components/properties/PropertyGallery";
 import ContactForm from "@/components/forms/ContactForm";
 import PropertyCard from "@/components/properties/PropertyCard";
+import { PropertyJsonLd } from "@/components/seo/JsonLd";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -57,8 +58,20 @@ export default async function PropertyDetailPage({ params }: Props) {
 
   const whatsappMsg = getPropertyWhatsAppMessage(property.title, property.slug);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://boettopropiedades.com";
+
   return (
     <>
+      <PropertyJsonLd
+        title={property.title}
+        description={property.description}
+        price={property.price}
+        currency={property.currency}
+        address={property.address}
+        city={property.city}
+        images={images}
+        url={`${siteUrl}/propiedades/${property.slug}`}
+      />
       <section className="py-8 bg-brand-cream">
         <div className="container-wide">
           <div className="flex items-center gap-2 text-sm text-brand-medium-gray mb-2">
