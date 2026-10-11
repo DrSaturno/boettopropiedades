@@ -1,6 +1,7 @@
 // Run against a local server with an isolated database and test admin credentials.
 // Example: SMOKE_ADMIN_EMAIL=... SMOKE_ADMIN_PASSWORD=... node scripts/smoke-local.mjs
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { unlink } from "node:fs/promises";
 import path from "node:path";
 
@@ -119,6 +120,23 @@ try {
   assert.ok(uploaded.url.startsWith("/uploads/") || uploaded.url.startsWith("https://"));
   if (uploaded.url.startsWith("/uploads/")) created.upload = path.join(process.cwd(), "public", uploaded.url.slice(1));
 
+  expect(await request(`/api/propiedades/${property.id}`, {
+    method: "PUT", body: { images: [uploaded.url] },
+  }), 200, "asociar imagen");
+  expect(await request(`/api/propiedades/${property.id}`, {
+    method: "PUT", body: { images: [] },
+  }), 200, "quitar imagen");
+  if (created.upload) {
+    assert.equal(existsSync(created.upload), false, "La imagen quitada sigue en disco");
+    created.upload = null;
+  }
+
+  const uploadedAgain = expect(await request("/api/upload", { method: "POST", form: upload }), 200, "subir segunda imagen");
+  if (uploadedAgain.url.startsWith("/uploads/")) created.upload = path.join(process.cwd(), "public", uploadedAgain.url.slice(1));
+  expect(await request(`/api/propiedades/${property.id}`, {
+    method: "PUT", body: { images: [uploadedAgain.url] },
+  }), 200, "asociar segunda imagen");
+
   const inquiry = expect(await request("/api/contacto", {
     method: "POST",
     body: { name: "Visita auditoría", email: visitorEmail, phone: "+541100000000", message: "Consulta de prueba", type: "property", propertyId: property.id },
@@ -173,6 +191,10 @@ try {
   }), 200, "republicar propiedad");
 
   expect(await request(`/api/propiedades/${property.id}`, { method: "DELETE" }), 200, "eliminar propiedad");
+  if (created.upload) {
+    assert.equal(existsSync(created.upload), false, "La imagen de la propiedad borrada sigue en disco");
+    created.upload = null;
+  }
   created.property = null;
   const retained = expect(await request(`/api/crm/leads/${leadId}`), 200, "conservar lead y consulta");
   assert.equal(retained.propertyId, null);

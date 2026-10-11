@@ -4,6 +4,7 @@ import { put } from "@vercel/blob";
 import { authOptions } from "@/lib/auth";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
+import { deleteUnusedPropertyImages, isManagedBlobImage, isManagedLocalImage } from "@/lib/property-images";
 import {
   getPropertyImagesBucket,
   getSupabaseAdmin,
@@ -91,5 +92,27 @@ export async function POST(request: Request) {
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: "Error al subir el archivo" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body.url !== "string" ||
+    (!isManagedBlobImage(body.url) && !isManagedLocalImage(body.url))) {
+    return NextResponse.json({ error: "Imagen inválida" }, { status: 400 });
+  }
+
+  try {
+    const { failed } = await deleteUnusedPropertyImages([body.url]);
+    if (failed) {
+      return NextResponse.json({ error: "No se pudo borrar la imagen" }, { status: 500 });
+    }
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("[upload] No se pudo borrar la imagen", error);
+    return NextResponse.json({ error: "No se pudo borrar la imagen" }, { status: 500 });
   }
 }

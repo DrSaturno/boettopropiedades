@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { readPropertyFields, revalidatePublicCatalog } from "@/lib/property-input";
+import { deleteUnusedPropertyImages, parsePropertyImages } from "@/lib/property-images";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -61,8 +62,14 @@ export async function PUT(request: Request, context: RouteContext) {
   }
 
   try {
+    const previous = await prisma.property.findUnique({ where: { id }, select: { images: true } });
+    if (!previous) return notFound();
     const property = await prisma.property.update({ where: { id }, data });
     revalidatePublicCatalog();
+    const currentImages = new Set(parsePropertyImages(property.images));
+    await deleteUnusedPropertyImages(
+      parsePropertyImages(previous.images).filter((url) => !currentImages.has(url))
+    );
     return NextResponse.json(property);
   } catch (error) {
     if (isNotFound(error)) return notFound();
@@ -82,6 +89,8 @@ export async function DELETE(_request: Request, context: RouteContext) {
   if (!id) return notFound();
 
   try {
+    const property = await prisma.property.findUnique({ where: { id }, select: { images: true } });
+    if (!property) return notFound();
     // Inquiries and leads are customer records: unlink them instead of deleting them.
     await prisma.$transaction([
       prisma.inquiry.updateMany({ where: { propertyId: id }, data: { propertyId: null } }),
@@ -89,6 +98,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
       prisma.property.delete({ where: { id } }),
     ]);
     revalidatePublicCatalog();
+    await deleteUnusedPropertyImages(parsePropertyImages(property.images));
     return NextResponse.json({ success: true });
   } catch (error) {
     if (isNotFound(error)) return notFound();

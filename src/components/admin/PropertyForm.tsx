@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ErrorNotice from "@/components/admin/ErrorNotice";
 import { errorMessage, fetchJson, sendJson } from "@/lib/admin-fetch";
@@ -85,6 +85,21 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [saveError, setSaveError] = useState("");
+  const unsavedUploads = useRef(new Set<string>());
+
+  useEffect(() => {
+    const uploads = unsavedUploads.current;
+    return () => {
+      for (const url of uploads) {
+        void fetch("/api/upload", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+          keepalive: true,
+        }).catch(() => {});
+      }
+    };
+  }, []);
 
   function update<K extends keyof PropertyFormData>(key: K, value: PropertyFormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -97,7 +112,16 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
   }
 
   function removeImage(index: number) {
+    const removedUrl = form.images[index];
     update("images", form.images.filter((_, i) => i !== index));
+    if (unsavedUploads.current.has(removedUrl)) {
+      unsavedUploads.current.delete(removedUrl);
+      void fetchJson("/api/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: removedUrl }),
+      }).catch((error) => setUploadError(errorMessage(error)));
+    }
   }
 
   async function uploadImages(files: FileList | null) {
@@ -116,6 +140,7 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
           method: "POST",
           body: payload,
         });
+        unsavedUploads.current.add(result.url);
         setForm((current) => ({ ...current, images: [...current.images, result.url] }));
       }
     } catch (error) {
@@ -143,6 +168,7 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
 
     try {
       await sendJson(url, isEditing ? "PUT" : "POST", form);
+      unsavedUploads.current.clear();
       router.push("/admin/propiedades");
       router.refresh();
     } catch (error) {
