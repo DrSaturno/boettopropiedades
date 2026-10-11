@@ -117,19 +117,19 @@ const propertyTypes = [
 const services = [
   {
     title: "Búsqueda guiada",
-    text: "Traducimos prioridades reales, tiempos y estilo de vida en una selección breve, familiar y bien acompañada.",
+    text: "Simplificamos tu búsqueda inmobiliaria, acercándote oportunidades seleccionadas y optimizando tu tiempo para que disfrutes el proceso de encontrar tu próximo hogar.",
     image: "/images/boetto-service-family-guidance.png",
     alt: "Asesora inmobiliaria conversando con una pareja en un living luminoso",
   },
   {
     title: "Contexto y claridad",
-    text: "Ordenamos zonas, tipologías y presupuesto para que cada decisión se sienta cercana, posible y bien cuidada.",
+    text: "Te ayudamos a encontrar la propiedad ideal, teniendo en cuenta tus necesidades, preferencias y presupuesto, con información clara y asesoramiento en cada etapa.",
     image: "/images/boetto-service-family-context.png",
     alt: "Familia recorriendo una casa cálida junto a una asesora inmobiliaria",
   },
   {
     title: "Visitas con calma",
-    text: "Seleccionamos propiedades para visitar con información precisa, sensibilidad humana y foco en lo que importa.",
+    text: "Te acompañamos en cada visita, brindándote asesoramiento personalizado, información clara y la tranquilidad de tomar la mejor decisión.",
     image: "/images/boetto-service-family-visit.png",
     alt: "Matrimonio y su hijo visitando una vivienda luminosa en Capital Federal",
   },
