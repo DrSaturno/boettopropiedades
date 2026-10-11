@@ -16,15 +16,9 @@ export default async function HomeProperties() {
     >
       <div className="section-shell">
         <header className="home-properties__header" data-reveal>
-          <div>
-            <h2 id="home-properties-title">
-              Una selección lista para conocer.
-            </h2>
-            <p>
-              Conocé las propiedades disponibles y encontrá la que va con tu
-              forma de vivir.
-            </p>
-          </div>
+          <h2 id="home-properties-title">
+            Una selección lista para conocer.
+          </h2>
           <Link
             href="/propiedades"
             className="home-properties__all"
