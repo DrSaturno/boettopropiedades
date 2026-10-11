@@ -118,6 +118,10 @@ export default async function PropertiesPage({ searchParams }: Props) {
     maxPrice: params.maxPrice ? Number(params.maxPrice) : undefined,
     bedrooms: params.bedrooms ? Number(params.bedrooms) : undefined,
   });
+  const hasFilters = Boolean(
+    operation || rawPropertyType || params.city || params.minPrice ||
+    params.maxPrice || params.bedrooms
+  );
 
   const resultContext =
     mode === "venta"
@@ -159,7 +163,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
                 : "Selección actualizada"}
             </span>
           </div>
-          <PropertyGrid properties={properties} />
+          <PropertyGrid properties={properties} hasFilters={hasFilters} />
         </div>
       </section>
 
