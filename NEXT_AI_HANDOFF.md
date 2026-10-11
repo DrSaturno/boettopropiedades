@@ -63,14 +63,14 @@ Este documento sigue los lineamientos de Spec-Driven Development (SDD). Es la fu
 - La prueba integral cubrió sesión admin, alta y edición parcial de propiedades, publicación y pausa con actualización de home/catálogo/ficha, subida de fotos, importación de código de Zonaprop, formulario de consulta, tasación, pipeline, estadísticas y conservación de clientes tras borrar una propiedad.
 - Los formularios guardan la consulta y su lead en una misma transacción (`src/lib/crm-service.ts`); se comprobó que dos consultas del mismo correo quedan ligadas a un único lead.
 - La revisión visual del panel y el pipeline en un viewport de 390 × 844 no mostró bloqueos de uso.
-- No se verificó esta versión en Vercel. La integración devolvió 403 para el equipo `drsaturnos-projects`; el usuario está reconectando el acceso. Aunque `main` está conectado a Vercel, un push no confirma por sí solo que el despliegue haya terminado correctamente.
+- El commit `45badf2` está en `main`, pero el despliegue falló mientras faltaban las variables de Turso. Luego se conectaron Turso, Vercel Blob y las variables SMTP. Se necesita un nuevo despliegue y verificar sus flujos públicos. La API de logs de Vercel aún devuelve 403 para `drsaturnos-projects`, aunque las consultas de proyecto, variables y despliegues funcionan.
 
 ## 5. Trabajo pendiente en producción
 
-1. **Acceso a Vercel**: reconectar la integración con acceso al equipo `drsaturnos-projects`. Hasta que permita leer el proyecto, no se pueden revisar variables, logs ni despliegues. El CLI local tampoco tiene credenciales de ese equipo.
-2. **Base y almacenamiento**: revisar en Vercel `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` y `BLOB_READ_WRITE_TOKEN`. El 11 de octubre de 2026, `https://www.boettopropiedades.com/api/propiedades` respondió 500 y el catálogo publicado mostraba ejemplos ficticios. Esto apunta a una versión vieja o a un problema de base, pero requiere logs y variables para distinguirlo. Aplicar `scripts/turso-setup.mjs` a Turso si faltan tablas; no usar `prisma db push` contra Turso.
-3. **Correo y acceso**: comprobar `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `SMTP_*` e `INQUIRY_EMAIL_TO` sin exponer sus valores. Probar una consulta real después de configurar SMTP.
-4. **Publicación**: comprobar el despliegue disparado por `main` y repetir el recorrido de admin, propiedades y CRM en la URL de Vercel. Verificar que las fotos recién subidas tengan una URL persistente de Vercel Blob.
+1. **Despliegue**: volver a desplegar `main` después de conectar Turso. Comprobar el resultado en Vercel y corregir cualquier fallo restante. La API de logs devuelve 403 y el CLI local carece de credenciales; los estados de despliegue sí pueden consultarse.
+2. **Base y almacenamiento**: Vercel ya tiene `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` y `BLOB_READ_WRITE_TOKEN`; se creó el almacén público `boetto-property-images`. El build crea las tablas faltantes antes del prerender. Confirmar que `/api/propiedades` deje de responder 500 y que una foto subida conserve una URL de Blob.
+3. **Correo y acceso**: Vercel ya tiene `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `SMTP_*` e `INQUIRY_EMAIL_TO`. Probar una consulta real y confirmar la notificación. La verificación SMTP local quedó sin respuesta por la conexión de este entorno.
+4. **Publicación**: repetir el recorrido de admin, propiedades, formularios y CRM en la URL pública; limpiar los datos de prueba después.
 5. **Imágenes importadas**: las fotos enlazadas a portales externos pueden dejar de verse cuando se elimina la publicación original; conviene guardarlas en Blob al importar si ese flujo es importante.
 
 El catálogo ficticio de `src/data/demo-properties.ts` solo aparece con `CATALOG_DEMO_MODE=true` y sin propiedades publicadas. En modo normal, la base vacía muestra un catálogo vacío y los errores de conexión no se ocultan con ejemplos.
