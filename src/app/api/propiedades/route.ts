@@ -1,61 +1,61 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import type { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { readPropertyFields, revalidatePublicCatalog } from "@/lib/property-input";
 import { slugify } from "@/lib/utils";
 
 export async function GET() {
-  const properties = await prisma.property.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { _count: { select: { inquiries: true } } },
-  });
-  return NextResponse.json(properties);
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  try {
+    const properties = await prisma.property.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { _count: { select: { inquiries: true } } },
+    });
+    return NextResponse.json(properties);
+  } catch (error) {
+    console.error("[propiedades] No se pudo listar", error);
+    return NextResponse.json(
+      { error: "No se pudo leer la base de datos" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+  }
+
+  const { data, error } = readPropertyFields(body);
+  if (error) return NextResponse.json({ error }, { status: 400 });
+  if (!data.title || !data.operation || !data.propertyType) {
+    return NextResponse.json(
+      { error: "Título, operación y tipo son obligatorios" },
+      { status: 400 }
+    );
+  }
+
+  const slug = `${slugify(String(data.title)) || "propiedad"}-${Date.now().toString(36)}`;
+
   try {
-    const body = await request.json();
-    const slug = body.slug || slugify(body.title) + "-" + Date.now().toString(36);
-
     const property = await prisma.property.create({
-      data: {
-        title: body.title,
-        slug,
-        operation: body.operation,
-        propertyType: body.propertyType,
-        status: body.status || "draft",
-        featured: body.featured || false,
-        price: body.price ? Number(body.price) : null,
-        currency: body.currency || "USD",
-        expenses: body.expenses ? Number(body.expenses) : null,
-        address: body.address || null,
-        neighborhood: body.neighborhood || null,
-        city: body.city || null,
-        province: body.province || "Ciudad Autónoma de Buenos Aires",
-        description: body.description || null,
-        totalArea: body.totalArea ? Number(body.totalArea) : null,
-        coveredArea: body.coveredArea ? Number(body.coveredArea) : null,
-        rooms: body.rooms ? Number(body.rooms) : null,
-        bedrooms: body.bedrooms ? Number(body.bedrooms) : null,
-        bathrooms: body.bathrooms ? Number(body.bathrooms) : null,
-        garages: body.garages ? Number(body.garages) : null,
-        age: body.age != null ? Number(body.age) : null,
-        amenities: body.amenities ? JSON.stringify(body.amenities) : null,
-        images: body.images ? JSON.stringify(body.images) : null,
-        videoUrl: body.videoUrl || null,
-        externalUrl: body.externalUrl || null,
-        externalSource: body.externalSource || "manual",
-        seoTitle: body.seoTitle || null,
-        seoDescription: body.seoDescription || null,
-      },
+      data: { status: "draft", ...data, slug } as Prisma.PropertyUncheckedCreateInput,
     });
-
+    revalidatePublicCatalog();
     return NextResponse.json(property, { status: 201 });
-  } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: "Error al crear la propiedad" }, { status: 500 });
+  } catch (error) {
+    console.error("[propiedades] No se pudo crear", error);
+    return NextResponse.json(
+      { error: "No se pudo guardar la propiedad en la base de datos" },
+      { status: 500 }
+    );
   }
 }

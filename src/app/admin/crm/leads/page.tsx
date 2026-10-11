@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import ErrorNotice from "@/components/admin/ErrorNotice";
+import { errorMessage, fetchJson, sendJson } from "@/lib/admin-fetch";
 import { LEAD_STAGES, LEAD_PRIORITIES, LEAD_SOURCES } from "@/lib/crm-constants";
 
 interface Lead {
@@ -31,6 +33,7 @@ export default function LeadsPage() {
   const [page, setPage] = useState(1);
   const [showNew, setShowNew] = useState(false);
   const [newLead, setNewLead] = useState({ name: "", email: "", phone: "", source: "web", priority: "media" });
+  const [error, setError] = useState("");
 
   const fetchLeads = useCallback(() => {
     const params = new URLSearchParams();
@@ -40,23 +43,26 @@ export default function LeadsPage() {
     if (filters.search) params.set("search", filters.search);
     params.set("page", String(page));
 
-    fetch(`/api/crm/leads?${params}`)
-      .then((r) => r.json())
-      .then(setData);
+    fetchJson<LeadsResponse>(`/api/crm/leads?${params}`)
+      .then((response) => {
+        setData(response);
+        setError("");
+      })
+      .catch((e) => setError(errorMessage(e)));
   }, [filters, page]);
 
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetch("/api/crm/leads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newLead),
-    });
-    setShowNew(false);
-    setNewLead({ name: "", email: "", phone: "", source: "web", priority: "media" });
-    fetchLeads();
+    try {
+      await sendJson("/api/crm/leads", "POST", newLead);
+      setShowNew(false);
+      setNewLead({ name: "", email: "", phone: "", source: "web", priority: "media" });
+      fetchLeads();
+    } catch (err) {
+      setError(errorMessage(err));
+    }
   };
 
   const stageColor = (value: string) =>
@@ -119,8 +125,10 @@ export default function LeadsPage() {
         </select>
       </div>
 
+      <ErrorNotice message={error} />
+
       {!data ? (
-        <p className="text-sm text-brand-medium-gray py-10 text-center">Cargando...</p>
+        !error && <p className="text-sm text-brand-medium-gray py-10 text-center">Cargando...</p>
       ) : data.leads.length === 0 ? (
         <div className="text-center py-16 bg-brand-surface border border-brand-warm-gray/50">
           <p className="text-brand-medium-gray mb-2">No hay leads</p>

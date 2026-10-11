@@ -34,6 +34,4 @@ export const INTERACTION_TYPES = [
   { value: "nota", label: "Nota interna", icon: "note" },
 ] as const;
 
-export const PIPELINE_STAGES = LEAD_STAGES.filter(
-  (s) => s.value !== "cerrado_ganado" && s.value !== "cerrado_perdido"
-);
+export const PIPELINE_STAGES = LEAD_STAGES;

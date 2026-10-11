@@ -2,38 +2,49 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { interactionInput } from "@/lib/lead-input";
 
 type RouteContext = { params: Promise<{ id: string }> };
+
+async function readId(context: RouteContext) {
+  const { id } = await context.params;
+  const number = Number(id);
+  return Number.isSafeInteger(number) && number > 0 ? number : null;
+}
 
 export async function GET(_request: NextRequest, context: RouteContext) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { id } = await context.params;
-  const leadId = Number(id);
+  const leadId = await readId(context);
+  if (!leadId) return NextResponse.json({ error: "Lead no encontrado" }, { status: 404 });
 
-  const interactions = await prisma.interaction.findMany({
-    where: { leadId },
-    orderBy: { createdAt: "desc" },
-  });
+  try {
+    const interactions = await prisma.interaction.findMany({
+      where: { leadId },
+      orderBy: { createdAt: "desc" },
+    });
 
-  return NextResponse.json(interactions);
+    return NextResponse.json(interactions);
+  } catch (error) {
+    console.error(`[crm] No se pudieron leer las interacciones de ${leadId}`, error);
+    return NextResponse.json({ error: "No se pudo leer el CRM" }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest, context: RouteContext) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { id } = await context.params;
-  const leadId = Number(id);
+  const leadId = await readId(context);
+  if (!leadId) return NextResponse.json({ error: "Lead no encontrado" }, { status: 404 });
 
   try {
-    const body = await request.json();
-    const { type, notes } = body;
-
-    if (!type || !notes) {
-      return NextResponse.json({ error: "Tipo y notas son requeridos" }, { status: 400 });
+    const parsed = interactionInput.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Revisá los datos de la interacción" }, { status: 400 });
     }
+    const { type, notes } = parsed.data;
 
     const interaction = await prisma.interaction.create({
       data: {

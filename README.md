@@ -1,23 +1,18 @@
 # Boetto Web
 
-Sitio web de Boetto Propiedades construido con Next.js, con una home editorial premium orientada a consulta, contexto de marca y conversion.
+Sitio web y panel privado de Boetto Propiedades, construido con Next.js.
 
 ## Estado actual
 
-Al 27 de julio de 2026 el proyecto incluye:
-
-1. Home principal con hero de video sujeto a scroll.
-2. Buscador integrado como ultimo capitulo del hero.
-3. Navegacion publica para comprar, alquilar, vender, conocer el estudio y contactar.
-4. Paginas publicas de propiedades, tasaciones, nosotros y contacto.
-5. Area admin y APIs internas en desarrollo dentro del mismo repo.
+El sitio incluye catálogo y fichas públicas, formularios de contacto y tasación, panel de propiedades, importación desde portales, consultas y CRM con pipeline. El 11 de octubre de 2026 se verificaron estos flujos contra un build local de producción con una base de datos aislada; la verificación del despliegue en Vercel sigue pendiente por falta de acceso al equipo del proyecto.
 
 ## Stack
 
 1. Next.js 16
 2. React 19
 3. TypeScript
-4. Prisma
+4. Prisma con SQLite local o Turso en producción
+5. Vercel Blob para fotos en producción
 
 ## Scripts
 
@@ -27,6 +22,10 @@ npm run build
 npm run start
 npm run lint
 ```
+
+Para repetir la prueba integral local, crear primero una base de datos aislada con `scripts/turso-setup.mjs`, iniciar la aplicación con `TURSO_DATABASE_URL=file:./prisma/audit-test.db` y credenciales de administrador de prueba, y ejecutar `node scripts/smoke-local.mjs`. El script solo acepta `localhost` o `127.0.0.1`, elimina los registros de prueba y comprueba el recorrido HTTP hasta la base de datos. En Windows, el servidor de desarrollo funciona de forma estable con `npm run dev -- --webpack -p 3004`.
+
+Las variables necesarias están descritas en `.env.example`. En Vercel, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `NEXTAUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` y `BLOB_READ_WRITE_TOKEN` son esenciales para el panel y las fotos. Las variables `SMTP_*` e `INQUIRY_EMAIL_TO` permiten notificar consultas por correo. El catálogo ficticio solo se habilita con `CATALOG_DEMO_MODE=true` mientras no haya publicaciones reales.
 
 ## Estructura principal
 
@@ -63,7 +62,6 @@ Puntos de entrada:
 - `specs/README.md`
 - `specs/2026-07-27-home-experience/`
 
-## Notas de validacion
+## Notas de validación
 
-1. El build de produccion debe seguir pasando antes de cerrar cambios importantes.
-2. El repo tiene deuda de lint historica fuera de la home; por eso conviene validar con foco cuando el cambio no toca esas areas.
+El 11 de octubre de 2026 pasaron `npm run lint`, `npx tsc --noEmit`, `npm run build` y `node scripts/smoke-local.mjs` contra `next start`. La prueba cubre publicar, editar, pausar y borrar una propiedad; actualización de la home y la ficha; subida de foto; importación por código pegado; consultas, tasaciones y CRM. Para el estado de producción, consultar `NEXT_AI_HANDOFF.md`.

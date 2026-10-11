@@ -1,4 +1,4 @@
-import { CURRENCIES, WHATSAPP_NUMBER } from "./constants";
+import { COMPANY_INFO, CURRENCIES, WHATSAPP_NUMBER } from "./constants";
 
 export function slugify(text: string): string {
   return text
@@ -34,7 +34,8 @@ export function getWhatsAppUrl(message: string, phone: string = WHATSAPP_NUMBER)
 }
 
 export function getPropertyWhatsAppMessage(title: string, slug: string): string {
-  return `Hola, me interesa la propiedad "${title}" publicada en boettopropiedades.com.ar/propiedades/${slug}. Me gustaría recibir más información.`;
+  const site = COMPANY_INFO.website.replace(/^https?:\/\//, "");
+  return `Hola, me interesa la propiedad "${title}" publicada en ${site}/propiedades/${slug}. Me gustaría recibir más información.`;
 }
 
 export function parseJsonField<T>(field: string | null | undefined, fallback: T): T {

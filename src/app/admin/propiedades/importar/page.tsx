@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ErrorNotice from "@/components/admin/ErrorNotice";
+import { errorMessage, sendJson } from "@/lib/admin-fetch";
 import { OPERATIONS, PROPERTY_TYPES, CURRENCIES, AMENITIES_LIST } from "@/lib/constants";
+
+// Stays under Vercel's 4.5 MB request limit.
+const MAX_PASTED_CHARS = 3_500_000;
 
 interface ScrapedData {
   title: string;
@@ -27,6 +32,7 @@ interface ScrapedData {
   source: string;
   externalUrl: string;
   warning?: string;
+  blocked?: boolean;
 }
 
 export default function ImportPropertyPage() {
@@ -36,25 +42,42 @@ export default function ImportPropertyPage() {
   const [error, setError] = useState("");
   const [data, setData] = useState<ScrapedData | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [pasteError, setPasteError] = useState("");
 
   async function handleScrape() {
     if (!url.trim()) return;
     setLoading(true);
     setError("");
+    setPasteError("");
+    setSaveError("");
     setData(null);
 
     try {
-      const res = await fetch("/api/scrape", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim() }),
-      });
-
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Error al importar");
-      setData(result);
+      setData(await sendJson<ScrapedData>("/api/scrape", "POST", { url: url.trim() }));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error desconocido");
+      setError(errorMessage(e));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function importFromHtml(html: string) {
+    if (!data || !html.trim()) return;
+    if (html.length > MAX_PASTED_CHARS) {
+      setPasteError("El código pegado es demasiado grande. Probá guardando la página y subiendo el archivo .html.");
+      return;
+    }
+
+    setLoading(true);
+    setPasteError("");
+
+    try {
+      setData(
+        await sendJson<ScrapedData>("/api/scrape", "POST", { url: data.externalUrl, html })
+      );
+    } catch (e) {
+      setPasteError(errorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -82,47 +105,38 @@ export default function ImportPropertyPage() {
   async function handlePublish() {
     if (!data || !data.title) return;
     setSaving(true);
+    setSaveError("");
 
     try {
-      const res = await fetch("/api/propiedades", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: data.title,
-          operation: data.operation,
-          propertyType: data.propertyType,
-          status: "draft",
-          featured: false,
-          price: data.price ? Number(data.price) : null,
-          currency: data.currency,
-          expenses: data.expenses ? Number(data.expenses) : null,
-          address: data.address,
-          neighborhood: data.neighborhood,
-          city: data.city,
-          province: "Ciudad Autónoma de Buenos Aires",
-          description: data.description,
-          totalArea: data.totalArea ? Number(data.totalArea) : null,
-          coveredArea: data.coveredArea ? Number(data.coveredArea) : null,
-          rooms: data.rooms ? Number(data.rooms) : null,
-          bedrooms: data.bedrooms ? Number(data.bedrooms) : null,
-          bathrooms: data.bathrooms ? Number(data.bathrooms) : null,
-          garages: data.garages ? Number(data.garages) : null,
-          age: data.age ? Number(data.age) : null,
-          amenities: data.amenities,
-          images: data.images,
-          externalUrl: data.externalUrl,
-          externalSource: data.source,
-        }),
+      await sendJson("/api/propiedades", "POST", {
+        title: data.title,
+        operation: data.operation,
+        propertyType: data.propertyType,
+        status: "draft",
+        featured: false,
+        price: data.price,
+        currency: data.currency,
+        expenses: data.expenses,
+        address: data.address,
+        neighborhood: data.neighborhood,
+        city: data.city,
+        description: data.description,
+        totalArea: data.totalArea,
+        coveredArea: data.coveredArea,
+        rooms: data.rooms,
+        bedrooms: data.bedrooms,
+        bathrooms: data.bathrooms,
+        garages: data.garages,
+        age: data.age,
+        amenities: data.amenities,
+        images: data.images,
+        externalUrl: data.externalUrl,
+        externalSource: data.source,
       });
-
-      if (res.ok) {
-        router.push("/admin/propiedades");
-        router.refresh();
-      } else {
-        throw new Error("Error al guardar");
-      }
-    } catch {
-      alert("Error al guardar la propiedad");
+      router.push("/admin/propiedades");
+      router.refresh();
+    } catch (e) {
+      setSaveError(errorMessage(e));
     } finally {
       setSaving(false);
     }
@@ -139,7 +153,7 @@ export default function ImportPropertyPage() {
         <p className="text-sm text-brand-medium-gray mb-4">
           Pegá el link de una propiedad de Zonaprop, Argenprop o MercadoLibre. Se extraerán los datos disponibles para que puedas editarlos antes de publicar.
         </p>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3 sm:flex-nowrap">
           <input
             type="url"
             value={url}
@@ -162,14 +176,59 @@ export default function ImportPropertyPage() {
       {data && (
         <div className="space-y-6">
           {data.warning && (
-            <div className="bg-amber-500/10 border border-amber-500/35 p-5 text-sm text-amber-300 rounded-sm flex items-start gap-3">
-              <svg className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <div className="bg-amber-50 border border-amber-300 p-5 text-sm text-amber-900 rounded-sm flex items-start gap-3">
+              <svg className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div>
                 <span className="font-semibold block mb-0.5">Extracción automática bloqueada</span>
                 {data.warning}
               </div>
+            </div>
+          )}
+
+          {data.blocked && (
+            <div className="bg-brand-surface border border-brand-warm-gray/50 p-6">
+              <h2 className="text-lg font-serif font-medium text-brand-dark mb-3">Traer los datos desde tu navegador</h2>
+              <ol className="list-decimal space-y-1.5 pl-5 text-sm text-brand-dark/80 mb-4">
+                <li>
+                  Abrí la publicación en otra pestaña:{" "}
+                  <a href={data.externalUrl} target="_blank" rel="noopener noreferrer" className="font-medium text-brand-dark underline">
+                    abrir publicación
+                  </a>
+                  .
+                </li>
+                <li>Con la publicación a la vista, apretá Ctrl + U (en Mac: Cmd + Option + U) para ver el código de la página.</li>
+                <li>Seleccioná todo con Ctrl + A y copialo con Ctrl + C.</li>
+                <li>Volvé acá, hacé clic en el recuadro y pegá con Ctrl + V.</li>
+              </ol>
+              <textarea
+                value=""
+                onChange={() => {}}
+                onPaste={(e) => {
+                  e.preventDefault();
+                  void importFromHtml(e.clipboardData.getData("text/plain"));
+                }}
+                rows={3}
+                disabled={loading}
+                placeholder={loading ? "Leyendo la publicación..." : "Hacé clic acá y pegá el código (Ctrl + V)"}
+                className={`${inputClass} resize-none`}
+              />
+              <label className="mt-3 block text-xs text-brand-medium-gray">
+                También podés guardar la publicación con Ctrl + S y subir el archivo .html:
+                <input
+                  type="file"
+                  accept=".html,.htm,text/html"
+                  disabled={loading}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    e.currentTarget.value = "";
+                    if (file) void file.text().then(importFromHtml);
+                  }}
+                  className="mt-2 block text-xs"
+                />
+              </label>
+              {pasteError && <p className="mt-3 text-sm text-red-600">{pasteError}</p>}
             </div>
           )}
           <div className="flex items-center gap-3 mb-2">
@@ -274,7 +333,9 @@ export default function ImportPropertyPage() {
             </div>
           )}
 
-          <div className="flex gap-4">
+          <ErrorNotice message={saveError} />
+
+          <div className="flex flex-wrap gap-4">
             <button
               onClick={handlePublish}
               disabled={saving || !data.title}

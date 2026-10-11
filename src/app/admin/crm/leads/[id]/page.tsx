@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import ErrorNotice from "@/components/admin/ErrorNotice";
+import { errorMessage, fetchJson, sendJson } from "@/lib/admin-fetch";
 import { LEAD_STAGES, LEAD_PRIORITIES, LEAD_SOURCES, INTERACTION_TYPES } from "@/lib/crm-constants";
 
 interface Interaction {
@@ -47,57 +49,63 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ stage: "", priority: "", notes: "", assignedTo: "" });
   const [newInteraction, setNewInteraction] = useState({ type: "nota", notes: "" });
+  const [error, setError] = useState("");
 
   const fetchLead = useCallback(() => {
-    fetch(`/api/crm/leads/${id}`)
-      .then((r) => r.json())
+    fetchJson<LeadDetail>(`/api/crm/leads/${id}`)
       .then((data) => {
         setLead(data);
         setForm({ stage: data.stage, priority: data.priority, notes: data.notes || "", assignedTo: data.assignedTo || "" });
-      });
+      })
+      .catch((e) => setError(errorMessage(e)));
   }, [id]);
 
   useEffect(() => { fetchLead(); }, [fetchLead]);
 
+  const run = async (action: () => Promise<unknown>) => {
+    setError("");
+    try {
+      await action();
+      return true;
+    } catch (e) {
+      setError(errorMessage(e));
+      return false;
+    }
+  };
+
   const handleSave = async () => {
-    await fetch(`/api/crm/leads/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    setEditing(false);
-    fetchLead();
+    if (await run(() => sendJson(`/api/crm/leads/${id}`, "PUT", form))) {
+      setEditing(false);
+      fetchLead();
+    }
   };
 
   const handleStageChange = async (stage: string) => {
-    await fetch(`/api/crm/leads/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ stage }),
-    });
-    fetchLead();
+    if (await run(() => sendJson(`/api/crm/leads/${id}`, "PUT", { stage }))) fetchLead();
   };
 
   const handleAddInteraction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newInteraction.notes.trim()) return;
-    await fetch(`/api/crm/leads/${id}/interactions`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newInteraction),
-    });
-    setNewInteraction({ type: "nota", notes: "" });
-    fetchLead();
+    if (await run(() => sendJson(`/api/crm/leads/${id}/interactions`, "POST", newInteraction))) {
+      setNewInteraction({ type: "nota", notes: "" });
+      fetchLead();
+    }
   };
 
   const handleDelete = async () => {
     if (!confirm("¿Eliminar este lead? Esta acción no se puede deshacer.")) return;
-    await fetch(`/api/crm/leads/${id}`, { method: "DELETE" });
-    router.push("/admin/crm/leads");
+    if (await run(() => fetchJson(`/api/crm/leads/${id}`, { method: "DELETE" }))) {
+      router.push("/admin/crm/leads");
+    }
   };
 
   if (!lead) {
-    return <p className="text-sm text-brand-medium-gray py-10 text-center">Cargando...</p>;
+    return error ? (
+      <ErrorNotice message={error} />
+    ) : (
+      <p className="text-sm text-brand-medium-gray py-10 text-center">Cargando...</p>
+    );
   }
 
   const stageInfo = LEAD_STAGES.find((s) => s.value === lead.stage);
@@ -113,6 +121,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div>
+      <ErrorNotice message={error} />
       <div className="flex items-center gap-3 mb-6">
         <Link href="/admin/crm/leads" className="text-brand-medium-gray hover:text-brand-dark transition-colors">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

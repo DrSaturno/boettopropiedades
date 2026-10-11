@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ErrorNotice from "@/components/admin/ErrorNotice";
+import { errorMessage, fetchJson } from "@/lib/admin-fetch";
 import { LEAD_STAGES, LEAD_SOURCES } from "@/lib/crm-constants";
 
 interface CrmStats {
@@ -25,12 +27,15 @@ interface CrmStats {
 
 export default function CrmDashboard() {
   const [stats, setStats] = useState<CrmStats | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/crm/stats")
-      .then((r) => r.json())
-      .then(setStats);
+    fetchJson<CrmStats>("/api/crm/stats")
+      .then(setStats)
+      .catch((e) => setError(errorMessage(e)));
   }, []);
+
+  if (error) return <ErrorNotice message={error} />;
 
   if (!stats) {
     return (
@@ -49,7 +54,7 @@ export default function CrmDashboard() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <h1 className="text-2xl font-serif font-medium text-brand-dark">CRM</h1>
         <div className="flex gap-3">
           <Link

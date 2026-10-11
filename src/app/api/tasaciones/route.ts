@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { deliverInquiryNotification } from "@/lib/inquiry-notifications";
-import { findOrCreateLead } from "@/lib/crm-service";
+import { createInquiryWithLead } from "@/lib/crm-service";
+import { valuationInput } from "@/lib/inquiry-input";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, phone, propertyType, operation, location, message } = body;
-
-    if (!name || !email || !phone) {
-      return NextResponse.json({ error: "Campos requeridos incompletos" }, { status: 400 });
+    const parsed = valuationInput.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Revisá los datos del formulario" }, { status: 400 });
     }
+    const { name, email, phone, propertyType, operation, location, message } = parsed.data;
 
     const fullMessage = [
       `Tipo: ${propertyType || "-"}`,
@@ -19,23 +18,13 @@ export async function POST(request: Request) {
       message ? `Comentarios: ${message}` : "",
     ].filter(Boolean).join("\n");
 
-    const inquiry = await prisma.inquiry.create({
-      data: {
-        name,
-        email,
-        phone,
-        message: fullMessage,
-        type: "tasacion",
-      },
-    });
-
-    findOrCreateLead({
-      inquiryId: inquiry.id,
+    const inquiry = await createInquiryWithLead({
       name,
       email,
       phone,
-      source: "web",
-    }).catch((err) => console.error("[crm] Error creating lead from tasacion:", err));
+      message: fullMessage,
+      type: "tasacion",
+    });
 
     const notificationStatus = await deliverInquiryNotification({
       id: inquiry.id,
@@ -52,7 +41,8 @@ export async function POST(request: Request) {
       id: inquiry.id,
       notificationStatus,
     });
-  } catch {
+  } catch (error) {
+    console.error("[tasaciones] No se pudo registrar la solicitud", error);
     return NextResponse.json({ error: "Error al procesar la solicitud" }, { status: 500 });
   }
 }

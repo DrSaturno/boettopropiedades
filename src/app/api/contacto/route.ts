@@ -1,41 +1,24 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { deliverInquiryNotification } from "@/lib/inquiry-notifications";
-import { findOrCreateLead } from "@/lib/crm-service";
+import { createInquiryWithLead } from "@/lib/crm-service";
+import { contactInput } from "@/lib/inquiry-input";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, phone, message, type, propertyId } = body;
-
-    if (!name || !email) {
-      return NextResponse.json({ error: "Nombre y email son requeridos" }, { status: 400 });
+    const parsed = contactInput.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Revisá los datos del formulario" }, { status: 400 });
     }
+    const { name, email, phone, message, type, propertyId } = parsed.data;
 
-    const inquiry = await prisma.inquiry.create({
-      data: {
-        name,
-        email,
-        phone: phone || null,
-        message: message || null,
-        type: type || "contact",
-        propertyId: propertyId ? Number(propertyId) : null,
-      },
-      include: {
-        property: {
-          select: { title: true },
-        },
-      },
-    });
-
-    findOrCreateLead({
-      inquiryId: inquiry.id,
+    const inquiry = await createInquiryWithLead({
       name,
       email,
       phone,
-      source: "web",
-      propertyId: propertyId ? Number(propertyId) : null,
-    }).catch((err) => console.error("[crm] Error creating lead from contacto:", err));
+      message,
+      type,
+      propertyId: propertyId || null,
+    });
 
     const notificationStatus = await deliverInquiryNotification({
       id: inquiry.id,
@@ -53,7 +36,8 @@ export async function POST(request: Request) {
       id: inquiry.id,
       notificationStatus,
     });
-  } catch {
+  } catch (error) {
+    console.error("[contacto] No se pudo registrar la consulta", error);
     return NextResponse.json({ error: "Error al procesar la consulta" }, { status: 500 });
   }
 }

@@ -20,6 +20,8 @@ interface CatalogResult {
   demoMode: boolean;
 }
 
+const demoCatalogEnabled = process.env.CATALOG_DEMO_MODE === "true";
+
 function mapDatabaseProperty(property: Property): PropertyData {
   return {
     ...property,
@@ -121,14 +123,15 @@ export async function getPublicPropertyCatalog(
         demoMode: false,
       };
     }
+
+    return {
+      properties: demoCatalogEnabled ? filterDemoProperties(filters) : [],
+      demoMode: demoCatalogEnabled,
+    };
   } catch (error) {
     console.error("[properties] Unable to load the property catalog", error);
+    throw error;
   }
-
-  return {
-    properties: filterDemoProperties(filters),
-    demoMode: true,
-  };
 }
 
 export async function getCatalogPropertyBySlug(slug: string): Promise<{
@@ -141,11 +144,16 @@ export async function getCatalogPropertyBySlug(slug: string): Promise<{
     if (property?.status === "published") {
       return { property: mapDatabaseProperty(property), demoMode: false };
     }
+
+    if (demoCatalogEnabled && await prisma.property.count({ where: { status: "published" } }) === 0) {
+      return { property: findDemoProperty(slug), demoMode: true };
+    }
+
+    return { property: null, demoMode: false };
   } catch (error) {
     console.error(`[properties] Unable to load property ${slug}`, error);
+    throw error;
   }
-
-  return { property: findDemoProperty(slug), demoMode: true };
 }
 
 export async function getRelatedCatalogProperties(
@@ -174,6 +182,7 @@ export async function getRelatedCatalogProperties(
         error
       );
     }
+    return [];
   }
 
   return DEMO_PROPERTIES.filter(
@@ -199,9 +208,12 @@ export async function getFeaturedCatalogProperties() {
 
       return properties.map(mapDatabaseProperty);
     }
+
+    return demoCatalogEnabled
+      ? DEMO_PROPERTIES.filter((property) => property.featured).slice(0, 6)
+      : [];
   } catch (error) {
     console.error("[home] Unable to load featured properties", error);
+    throw error;
   }
-
-  return DEMO_PROPERTIES.filter((property) => property.featured).slice(0, 6);
 }

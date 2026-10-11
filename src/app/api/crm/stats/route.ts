@@ -13,38 +13,43 @@ export async function GET() {
   startOfWeek.setDate(now.getDate() - now.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
 
-  const [
-    totalLeads,
-    newThisMonth,
-    newThisWeek,
-    byStage,
-    bySource,
-    byPriority,
-    recentLeads,
-  ] = await Promise.all([
-    prisma.lead.count(),
-    prisma.lead.count({ where: { createdAt: { gte: startOfMonth } } }),
-    prisma.lead.count({ where: { createdAt: { gte: startOfWeek } } }),
-    prisma.lead.groupBy({ by: ["stage"], _count: { id: true } }),
-    prisma.lead.groupBy({ by: ["source"], _count: { id: true } }),
-    prisma.lead.groupBy({ by: ["priority"], _count: { id: true } }),
-    prisma.lead.findMany({
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      include: {
-        property: { select: { title: true } },
-        _count: { select: { interactions: true } },
-      },
-    }),
-  ]);
+  try {
+    const [
+      totalLeads,
+      newThisMonth,
+      newThisWeek,
+      byStage,
+      bySource,
+      byPriority,
+      recentLeads,
+    ] = await Promise.all([
+      prisma.lead.count(),
+      prisma.lead.count({ where: { createdAt: { gte: startOfMonth } } }),
+      prisma.lead.count({ where: { createdAt: { gte: startOfWeek } } }),
+      prisma.lead.groupBy({ by: ["stage"], _count: { id: true } }),
+      prisma.lead.groupBy({ by: ["source"], _count: { id: true } }),
+      prisma.lead.groupBy({ by: ["priority"], _count: { id: true } }),
+      prisma.lead.findMany({
+        take: 5,
+        orderBy: { createdAt: "desc" },
+        include: {
+          property: { select: { title: true } },
+          _count: { select: { interactions: true } },
+        },
+      }),
+    ]);
 
-  return NextResponse.json({
-    totalLeads,
-    newThisMonth,
-    newThisWeek,
-    byStage: Object.fromEntries(byStage.map((s) => [s.stage, s._count.id])),
-    bySource: Object.fromEntries(bySource.map((s) => [s.source, s._count.id])),
-    byPriority: Object.fromEntries(byPriority.map((s) => [s.priority, s._count.id])),
-    recentLeads,
-  });
+    return NextResponse.json({
+      totalLeads,
+      newThisMonth,
+      newThisWeek,
+      byStage: Object.fromEntries(byStage.map((s) => [s.stage, s._count.id])),
+      bySource: Object.fromEntries(bySource.map((s) => [s.source, s._count.id])),
+      byPriority: Object.fromEntries(byPriority.map((s) => [s.priority, s._count.id])),
+      recentLeads,
+    });
+  } catch (error) {
+    console.error("[crm] No se pudieron leer las estadísticas", error);
+    return NextResponse.json({ error: "No se pudo leer el CRM" }, { status: 500 });
+  }
 }

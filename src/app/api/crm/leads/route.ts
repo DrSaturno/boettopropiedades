@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { leadInput } from "@/lib/lead-input";
+
+function positiveInteger(value: string | null, fallback: number) {
+  const number = Number(value);
+  return Number.isSafeInteger(number) && number > 0 ? number : fallback;
+}
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -12,8 +18,8 @@ export async function GET(request: NextRequest) {
   const priority = searchParams.get("priority");
   const source = searchParams.get("source");
   const search = searchParams.get("search");
-  const page = Math.max(1, Number(searchParams.get("page")) || 1);
-  const limit = Math.min(100, Math.max(1, Number(searchParams.get("limit")) || 20));
+  const page = positiveInteger(searchParams.get("page"), 1);
+  const limit = Math.min(100, positiveInteger(searchParams.get("limit"), 20));
 
   const where: Record<string, unknown> = {};
   if (stage) where.stage = stage;
@@ -27,21 +33,26 @@ export async function GET(request: NextRequest) {
     ];
   }
 
-  const [leads, total] = await Promise.all([
-    prisma.lead.findMany({
-      where,
-      include: {
-        property: { select: { id: true, title: true } },
-        _count: { select: { interactions: true, inquiries: true } },
-      },
-      orderBy: { updatedAt: "desc" },
-      skip: (page - 1) * limit,
-      take: limit,
-    }),
-    prisma.lead.count({ where }),
-  ]);
+  try {
+    const [leads, total] = await Promise.all([
+      prisma.lead.findMany({
+        where,
+        include: {
+          property: { select: { id: true, title: true } },
+          _count: { select: { interactions: true, inquiries: true } },
+        },
+        orderBy: { updatedAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.lead.count({ where }),
+    ]);
 
-  return NextResponse.json({ leads, total, page, limit, pages: Math.ceil(total / limit) });
+    return NextResponse.json({ leads, total, page, limit, pages: Math.ceil(total / limit) });
+  } catch (error) {
+    console.error("[crm] No se pudieron listar los leads", error);
+    return NextResponse.json({ error: "No se pudo leer el CRM" }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -49,12 +60,11 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   try {
-    const body = await request.json();
-    const { name, email, phone, source, stage, priority, notes, assignedTo, propertyId, tags } = body;
-
-    if (!name || !email) {
-      return NextResponse.json({ error: "Nombre y email son requeridos" }, { status: 400 });
+    const parsed = leadInput.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Revisá los datos del lead" }, { status: 400 });
     }
+    const { name, email, phone, source, stage, priority, notes, assignedTo, propertyId, tags } = parsed.data;
 
     const lead = await prisma.lead.create({
       data: {
@@ -66,7 +76,7 @@ export async function POST(request: NextRequest) {
         priority: priority || "media",
         notes: notes || null,
         assignedTo: assignedTo || null,
-        propertyId: propertyId ? Number(propertyId) : null,
+        propertyId: propertyId || null,
         tags: tags ? JSON.stringify(tags) : null,
       },
       include: {

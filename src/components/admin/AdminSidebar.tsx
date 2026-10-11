@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -46,78 +47,122 @@ const NAV = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  // The most specific entry wins, so "Propiedades" is not lit on its sub-pages.
+  const activeHref = NAV.filter(
+    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
+  ).sort((a, b) => b.href.length - a.href.length)[0]?.href;
 
   return (
-    <aside className="w-64 min-h-screen shrink-0 border-r border-white/10 bg-brand-dark text-white flex flex-col">
-      <div className="border-b border-white/10 p-6">
+    <>
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/10 bg-brand-dark px-4 py-3 text-white md:hidden">
         <Link href="/admin">
           <Image
             src="/logos/logo-white.svg"
             alt="Boetto Propiedades"
-            width={180}
-            height={40}
-            className="h-11 w-auto"
+            width={144}
+            height={32}
+            className="h-8 w-auto"
           />
         </Link>
-      </div>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="Abrir menú"
+          aria-expanded={open}
+          className="p-2"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+          </svg>
+        </button>
+      </header>
 
-      <nav className="flex-1 py-4">
-        {NAV.map((item) => {
-          const active =
-            pathname === item.href ||
-            (item.href !== "/admin" && pathname.startsWith(item.href));
+      {open && (
+        <button
+          type="button"
+          aria-label="Cerrar menú"
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+        />
+      )}
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-6 py-3 text-sm transition-colors",
-                active
-                  ? "bg-white/10 font-medium text-white"
-                  : "text-white/70 hover:bg-white/5 hover:text-white"
-              )}
-            >
-              <svg
-                className="w-5 h-5 shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d={item.icon}
-                />
-              </svg>
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="border-t border-white/10 p-4 flex flex-col items-center">
-        <div className="w-full flex justify-between mb-6 px-1">
-          <Link
-            href="/"
-            className="text-xs font-medium text-white/60 transition-colors hover:text-white"
-          >
-            Ver sitio web
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-brand-dark text-white transition-transform md:static md:min-h-screen md:translate-x-0",
+          open ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="border-b border-white/10 p-6">
+          <Link href="/admin" onClick={() => setOpen(false)}>
+            <Image
+              src="/logos/logo-white.svg"
+              alt="Boetto Propiedades"
+              width={180}
+              height={40}
+              className="h-11 w-auto"
+            />
           </Link>
-          <button
-            onClick={() => signOut({ callbackUrl: "/admin/login" })}
-            className="cursor-pointer text-xs font-medium text-white/60 transition-colors hover:text-white"
-          >
-            Cerrar sesion
-          </button>
         </div>
-        <div className="text-[10px] uppercase tracking-wider text-white/30 text-center hover:text-white/80 transition-colors">
-          <a href="https://www.planetasaturno.com" target="_blank" rel="noopener noreferrer">
-            By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
-          </a>
+
+        <nav className="flex-1 py-4">
+          {NAV.map((item) => {
+            const active = item.href === activeHref;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-6 py-3 text-sm transition-colors",
+                  active
+                    ? "bg-white/10 font-medium text-white"
+                    : "text-white/70 hover:bg-white/5 hover:text-white"
+                )}
+              >
+                <svg
+                  className="w-5 h-5 shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d={item.icon}
+                  />
+                </svg>
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="border-t border-white/10 p-4 flex flex-col items-center">
+          <div className="w-full flex justify-between mb-6 px-1">
+            <Link
+              href="/"
+              className="text-xs font-medium text-white/60 transition-colors hover:text-white"
+            >
+              Ver sitio web
+            </Link>
+            <button
+              onClick={() => signOut({ callbackUrl: "/admin/login" })}
+              className="cursor-pointer text-xs font-medium text-white/60 transition-colors hover:text-white"
+            >
+              Cerrar sesion
+            </button>
+          </div>
+          <div className="text-[10px] uppercase tracking-wider text-white/30 text-center hover:text-white/80 transition-colors">
+            <a href="https://www.planetasaturno.com" target="_blank" rel="noopener noreferrer">
+              By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
+            </a>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }

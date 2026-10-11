@@ -23,7 +23,9 @@ interface Props {
 }
 
 export function generateStaticParams() {
-  return DEMO_PROPERTIES.map(({ slug }) => ({ slug }));
+  return process.env.CATALOG_DEMO_MODE === "true"
+    ? DEMO_PROPERTIES.map(({ slug }) => ({ slug }))
+    : [];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

@@ -1,65 +1,76 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { Prisma } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { readPropertyFields, revalidatePublicCatalog } from "@/lib/property-input";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-export async function GET(_request: Request, context: RouteContext) {
+async function readId(context: RouteContext) {
   const { id } = await context.params;
-  const property = await prisma.property.findUnique({
-    where: { id: Number(id) },
-    include: { inquiries: { orderBy: { createdAt: "desc" } } },
-  });
-  if (!property) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
-  return NextResponse.json(property);
+  const numericId = Number(id);
+  return Number.isInteger(numericId) && numericId > 0 ? numericId : null;
+}
+
+function isNotFound(error: unknown) {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025"
+  );
+}
+
+const notFound = () => NextResponse.json({ error: "No encontrada" }, { status: 404 });
+
+export async function GET(_request: Request, context: RouteContext) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  const id = await readId(context);
+  if (!id) return notFound();
+
+  try {
+    const property = await prisma.property.findUnique({ where: { id } });
+    return property ? NextResponse.json(property) : notFound();
+  } catch (error) {
+    console.error(`[propiedades] No se pudo leer ${id}`, error);
+    return NextResponse.json(
+      { error: "No se pudo leer la base de datos" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function PUT(request: Request, context: RouteContext) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { id } = await context.params;
-  const body = await request.json();
+  const id = await readId(context);
+  if (!id) return notFound();
+
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+  }
+
+  const { data, error } = readPropertyFields(body);
+  if (error) return NextResponse.json({ error }, { status: 400 });
+  if (Object.keys(data).length === 0) {
+    return NextResponse.json({ error: "No hay cambios para guardar" }, { status: 400 });
+  }
 
   try {
-    const property = await prisma.property.update({
-      where: { id: Number(id) },
-      data: {
-        title: body.title,
-        operation: body.operation,
-        propertyType: body.propertyType,
-        status: body.status,
-        featured: body.featured,
-        price: body.price != null ? Number(body.price) : null,
-        currency: body.currency,
-        expenses: body.expenses != null ? Number(body.expenses) : null,
-        address: body.address || null,
-        neighborhood: body.neighborhood || null,
-        city: body.city || null,
-        province: body.province || "Ciudad Autónoma de Buenos Aires",
-        description: body.description || null,
-        totalArea: body.totalArea != null ? Number(body.totalArea) : null,
-        coveredArea: body.coveredArea != null ? Number(body.coveredArea) : null,
-        rooms: body.rooms != null ? Number(body.rooms) : null,
-        bedrooms: body.bedrooms != null ? Number(body.bedrooms) : null,
-        bathrooms: body.bathrooms != null ? Number(body.bathrooms) : null,
-        garages: body.garages != null ? Number(body.garages) : null,
-        age: body.age != null ? Number(body.age) : null,
-        amenities: body.amenities ? JSON.stringify(body.amenities) : null,
-        images: body.images ? JSON.stringify(body.images) : null,
-        videoUrl: body.videoUrl || null,
-        externalUrl: body.externalUrl || null,
-        externalSource: body.externalSource,
-        seoTitle: body.seoTitle || null,
-        seoDescription: body.seoDescription || null,
-      },
-    });
+    const property = await prisma.property.update({ where: { id }, data });
+    revalidatePublicCatalog();
     return NextResponse.json(property);
-  } catch {
-    return NextResponse.json({ error: "Error al actualizar" }, { status: 500 });
+  } catch (error) {
+    if (isNotFound(error)) return notFound();
+    console.error(`[propiedades] No se pudo actualizar ${id}`, error);
+    return NextResponse.json(
+      { error: "No se pudo guardar el cambio en la base de datos" },
+      { status: 500 }
+    );
   }
 }
 
@@ -67,12 +78,24 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const { id } = await context.params;
+  const id = await readId(context);
+  if (!id) return notFound();
+
   try {
-    await prisma.inquiry.deleteMany({ where: { propertyId: Number(id) } });
-    await prisma.property.delete({ where: { id: Number(id) } });
+    // Inquiries and leads are customer records: unlink them instead of deleting them.
+    await prisma.$transaction([
+      prisma.inquiry.updateMany({ where: { propertyId: id }, data: { propertyId: null } }),
+      prisma.lead.updateMany({ where: { propertyId: id }, data: { propertyId: null } }),
+      prisma.property.delete({ where: { id } }),
+    ]);
+    revalidatePublicCatalog();
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Error al eliminar" }, { status: 500 });
+  } catch (error) {
+    if (isNotFound(error)) return notFound();
+    console.error(`[propiedades] No se pudo eliminar ${id}`, error);
+    return NextResponse.json(
+      { error: "No se pudo eliminar la propiedad" },
+      { status: 500 }
+    );
   }
 }

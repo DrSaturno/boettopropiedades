@@ -13,37 +13,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/nosotros`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
   ];
 
-  let propertyPages: MetadataRoute.Sitemap = [];
-
-  try {
-    const properties = await prisma.property.findMany({
-      where: { status: "published" },
-      select: { slug: true, updatedAt: true },
-    });
-
-    if (properties.length > 0) {
-      propertyPages = properties.map((p) => ({
-        url: `${BASE_URL}/propiedades/${p.slug}`,
-        lastModified: p.updatedAt,
-        changeFrequency: "weekly" as const,
-        priority: 0.8,
-      }));
-    } else {
-      propertyPages = DEMO_PROPERTIES.map((p) => ({
-        url: `${BASE_URL}/propiedades/${p.slug}`,
-        lastModified: new Date(),
-        changeFrequency: "weekly" as const,
-        priority: 0.8,
-      }));
-    }
-  } catch {
-    propertyPages = DEMO_PROPERTIES.map((p) => ({
+  const properties = await prisma.property.findMany({
+    where: { status: "published" },
+    select: { slug: true, updatedAt: true },
+  });
+  const propertyPages: MetadataRoute.Sitemap = properties.length === 0 && process.env.CATALOG_DEMO_MODE === "true"
+    ? DEMO_PROPERTIES.map((p) => ({
       url: `${BASE_URL}/propiedades/${p.slug}`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
+    }))
+    : properties.map((p) => ({
+      url: `${BASE_URL}/propiedades/${p.slug}`,
+      lastModified: p.updatedAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
     }));
-  }
 
   return [...staticPages, ...propertyPages];
 }

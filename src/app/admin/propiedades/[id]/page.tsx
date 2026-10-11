@@ -2,52 +2,55 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import ErrorNotice from "@/components/admin/ErrorNotice";
 import PropertyForm from "@/components/admin/PropertyForm";
+import { errorMessage, fetchJson } from "@/lib/admin-fetch";
+import { parseJsonField } from "@/lib/utils";
+
+type PropertyRecord = Record<string, string | number | boolean | null>;
+
+const text = (value: PropertyRecord[string]) => (value == null ? "" : String(value));
 
 export default function EditPropertyPage() {
   const params = useParams();
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch(`/api/propiedades/${params.id}`)
-      .then((r) => r.json())
+    fetchJson<PropertyRecord>(`/api/propiedades/${params.id}`)
       .then((prop) => {
-        let images: string[] = [];
-        let amenities: string[] = [];
-        try { images = JSON.parse(prop.images || "[]"); } catch { images = []; }
-        try { amenities = JSON.parse(prop.amenities || "[]"); } catch { amenities = []; }
-
         setData({
           id: prop.id,
-          title: prop.title || "",
-          operation: prop.operation || "venta",
-          propertyType: prop.propertyType || "casa",
-          status: prop.status || "draft",
-          featured: prop.featured || false,
-          price: prop.price?.toString() || "",
-          currency: prop.currency || "USD",
-          expenses: prop.expenses?.toString() || "",
-          address: prop.address || "",
-          neighborhood: prop.neighborhood || "",
-          city: prop.city || "",
-          province: prop.province || "Córdoba",
-          description: prop.description || "",
-          totalArea: prop.totalArea?.toString() || "",
-          coveredArea: prop.coveredArea?.toString() || "",
-          rooms: prop.rooms?.toString() || "",
-          bedrooms: prop.bedrooms?.toString() || "",
-          bathrooms: prop.bathrooms?.toString() || "",
-          garages: prop.garages?.toString() || "",
-          age: prop.age != null ? prop.age.toString() : "",
-          amenities,
-          images,
-          videoUrl: prop.videoUrl || "",
-          externalUrl: prop.externalUrl || "",
-          externalSource: prop.externalSource || "manual",
+          title: text(prop.title),
+          operation: text(prop.operation) || "venta",
+          propertyType: text(prop.propertyType) || "casa",
+          status: text(prop.status) || "draft",
+          featured: Boolean(prop.featured),
+          price: text(prop.price),
+          currency: text(prop.currency) || "USD",
+          expenses: text(prop.expenses),
+          address: text(prop.address),
+          neighborhood: text(prop.neighborhood),
+          city: text(prop.city),
+          province: text(prop.province) || "Ciudad Autónoma de Buenos Aires",
+          description: text(prop.description),
+          totalArea: text(prop.totalArea),
+          coveredArea: text(prop.coveredArea),
+          rooms: text(prop.rooms),
+          bedrooms: text(prop.bedrooms),
+          bathrooms: text(prop.bathrooms),
+          garages: text(prop.garages),
+          age: text(prop.age),
+          amenities: parseJsonField<string[]>(prop.amenities as string | null, []),
+          images: parseJsonField<string[]>(prop.images as string | null, []),
+          videoUrl: text(prop.videoUrl),
+          externalUrl: text(prop.externalUrl),
+          externalSource: text(prop.externalSource) || "manual",
         });
-        setLoading(false);
-      });
+      })
+      .catch((e) => setError(errorMessage(e)))
+      .finally(() => setLoading(false));
   }, [params.id]);
 
   if (loading) return <p className="text-sm text-brand-medium-gray">Cargando...</p>;
@@ -55,6 +58,7 @@ export default function EditPropertyPage() {
   return (
     <div>
       <h1 className="text-2xl font-serif font-medium text-brand-dark mb-8">Editar propiedad</h1>
+      <ErrorNotice message={error} />
       {data && <PropertyForm initialData={data} isEditing />}
     </div>
   );

@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ErrorNotice from "@/components/admin/ErrorNotice";
+import { errorMessage, fetchJson } from "@/lib/admin-fetch";
 
 interface Stats {
   total: number;
@@ -11,13 +13,15 @@ interface Stats {
   alquiler: number;
 }
 
+type PropertySummary = { status: string; featured: boolean; operation: string };
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats>({ total: 0, published: 0, featured: 0, venta: 0, alquiler: 0 });
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/propiedades")
-      .then((r) => r.json())
-      .then((data: Array<{ status: string; featured: boolean; operation: string }>) => {
+    fetchJson<PropertySummary[]>("/api/propiedades")
+      .then((data) => {
         setStats({
           total: data.length,
           published: data.filter((p) => p.status === "published").length,
@@ -25,12 +29,14 @@ export default function AdminDashboard() {
           venta: data.filter((p) => p.operation === "venta").length,
           alquiler: data.filter((p) => p.operation === "alquiler").length,
         });
-      });
+      })
+      .catch((e) => setError(errorMessage(e)));
   }, []);
 
   return (
     <div>
       <h1 className="text-2xl font-serif font-medium text-brand-dark mb-8">Dashboard</h1>
+      <ErrorNotice message={error} />
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
         {[
@@ -47,7 +53,7 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4">
         <Link href="/admin/propiedades/nueva" className="px-6 py-3 bg-brand-sage text-white text-sm font-medium hover:bg-brand-sage-dark transition-colors">
           Crear propiedad
         </Link>

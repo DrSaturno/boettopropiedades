@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ErrorNotice from "@/components/admin/ErrorNotice";
+import { errorMessage, fetchJson, sendJson } from "@/lib/admin-fetch";
 
 interface Inquiry {
   id: number;
@@ -10,6 +12,7 @@ interface Inquiry {
   message: string | null;
   type: string;
   read: boolean;
+  notificationStatus: string;
   createdAt: string;
   property: { id: number; title: string } | null;
 }
@@ -18,26 +21,34 @@ export default function AdminConsultasPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("/api/consultas")
-      .then((r) => r.json())
-      .then((data) => { setInquiries(data); setLoading(false); });
+    fetchJson<Inquiry[]>("/api/consultas")
+      .then(setInquiries)
+      .catch((e) => setError(errorMessage(e)))
+      .finally(() => setLoading(false));
   }, []);
 
   async function toggleRead(id: number, read: boolean) {
-    await fetch(`/api/consultas/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ read: !read }),
-    });
-    setInquiries((prev) => prev.map((i) => i.id === id ? { ...i, read: !read } : i));
+    setError("");
+    try {
+      await sendJson(`/api/consultas/${id}`, "PUT", { read: !read });
+      setInquiries((prev) => prev.map((i) => i.id === id ? { ...i, read: !read } : i));
+    } catch (e) {
+      setError(errorMessage(e));
+    }
   }
 
   async function deleteInquiry(id: number) {
     if (!confirm("¿Eliminar esta consulta?")) return;
-    await fetch(`/api/consultas/${id}`, { method: "DELETE" });
-    setInquiries((prev) => prev.filter((i) => i.id !== id));
+    setError("");
+    try {
+      await fetchJson(`/api/consultas/${id}`, { method: "DELETE" });
+      setInquiries((prev) => prev.filter((i) => i.id !== id));
+    } catch (e) {
+      setError(errorMessage(e));
+    }
   }
 
   const filtered = filter === "all" ? inquiries
@@ -54,9 +65,10 @@ export default function AdminConsultasPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <ErrorNotice message={error} />
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <h1 className="text-2xl font-serif font-medium text-brand-dark">Consultas</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {["all", "unread", "contact", "tasacion", "property"].map((f) => (
             <button
               key={f}
@@ -85,8 +97,11 @@ export default function AdminConsultasPage() {
                   {!inq.read && (
                     <span className="w-2 h-2 bg-brand-sage rounded-full" />
                   )}
+                  {inq.notificationStatus === "failed" && (
+                    <span className="px-2 py-0.5 text-xs bg-amber-100 text-amber-800">Email no enviado</span>
+                  )}
                 </div>
-                <div className="flex gap-4 text-xs text-brand-medium-gray mb-2">
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-brand-medium-gray mb-2">
                   <span>{inq.email}</span>
                   {inq.phone && <span>{inq.phone}</span>}
                   <span>{new Date(inq.createdAt).toLocaleDateString("es-AR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>

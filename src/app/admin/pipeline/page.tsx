@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { PIPELINE_STAGES, LEAD_PRIORITIES } from "@/lib/crm-constants";
+import ErrorNotice from "@/components/admin/ErrorNotice";
+import { errorMessage, fetchJson, sendJson } from "@/lib/admin-fetch";
+import { LEAD_STAGES, PIPELINE_STAGES, LEAD_PRIORITIES } from "@/lib/crm-constants";
 
 interface Lead {
   id: number;
@@ -20,25 +22,35 @@ interface Lead {
 export default function PipelinePage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchLeads = useCallback(() => {
-    fetch("/api/crm/leads?limit=100")
-      .then((r) => r.json())
-      .then((data) => {
-        setLeads(data.leads || []);
-        setLoading(false);
-      });
+    async function loadAllLeads() {
+      const first = await fetchJson<{ leads: Lead[]; pages: number }>("/api/crm/leads?limit=100&page=1");
+      const pages = await Promise.all(
+        Array.from({ length: Math.max(0, first.pages - 1) }, (_, index) =>
+          fetchJson<{ leads: Lead[] }>(`/api/crm/leads?limit=100&page=${index + 2}`)
+        )
+      );
+      setLeads([...first.leads, ...pages.flatMap((page) => page.leads)]);
+      setError("");
+    }
+
+    loadAllLeads()
+      .catch((e) => setError(errorMessage(e)))
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
 
   const moveToStage = async (leadId: number, stage: string) => {
-    await fetch(`/api/crm/leads/${leadId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ stage }),
-    });
-    fetchLeads();
+    setError("");
+    try {
+      await sendJson(`/api/crm/leads/${leadId}`, "PUT", { stage });
+      fetchLeads();
+    } catch (e) {
+      setError(errorMessage(e));
+    }
   };
 
   const priorityDot = (priority: string) => {
@@ -56,6 +68,7 @@ export default function PipelinePage() {
 
   return (
     <div>
+      <ErrorNotice message={error} />
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-serif font-medium text-brand-dark">Pipeline</h1>
         <Link
@@ -90,22 +103,22 @@ export default function PipelinePage() {
                     {lead.property && (
                       <p className="text-[10px] text-brand-medium-gray mb-2 truncate">{lead.property.title}</p>
                     )}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                       <span className="text-[10px] text-brand-medium-gray">
                         {LEAD_PRIORITIES.find((p) => p.value === lead.priority)?.label}
                       </span>
-                      <div className="flex gap-1">
-                        {PIPELINE_STAGES.filter((s) => s.value !== stage.value).slice(0, 3).map((targetStage) => (
-                          <button
-                            key={targetStage.value}
-                            onClick={() => moveToStage(lead.id, targetStage.value)}
-                            title={`Mover a ${targetStage.label}`}
-                            className="text-[9px] px-1.5 py-0.5 bg-gray-50 text-gray-500 hover:bg-gray-100 rounded transition-colors"
-                          >
-                            {targetStage.label.slice(0, 3)}
-                          </button>
+                      <select
+                        aria-label={`Mover a ${lead.name} de etapa`}
+                        value={lead.stage}
+                        onChange={(e) => moveToStage(lead.id, e.target.value)}
+                        className="max-w-[150px] border border-brand-warm-gray/50 bg-brand-surface px-1.5 py-1 text-[11px] text-brand-dark focus:outline-none focus:border-brand-sage"
+                      >
+                        {LEAD_STAGES.map((target) => (
+                          <option key={target.value} value={target.value}>
+                            {target.label}
+                          </option>
                         ))}
-                      </div>
+                      </select>
                     </div>
                   </div>
                 ))}

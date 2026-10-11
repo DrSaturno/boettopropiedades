@@ -19,15 +19,15 @@ export default async function FeaturedProperties() {
               Una selección lista para conocer.
             </h2>
             <p>
-              Seis maneras distintas de vivir la ciudad, elegidas por su
-              arquitectura, ubicación y calidad espacial.
+              Propiedades elegidas por su arquitectura, ubicación y calidad
+              espacial.
             </p>
           </div>
           <Link
             href="/propiedades"
             className="home-properties__all"
           >
-            Explorar las 20 propiedades
+            Explorar propiedades
             <span aria-hidden="true">→</span>
           </Link>
         </header>

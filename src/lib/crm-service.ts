@@ -1,51 +1,62 @@
 import { prisma } from "@/lib/prisma";
 
-interface CreateLeadFromInquiry {
-  inquiryId: number;
+interface CreateInquiryWithLead {
   name: string;
   email: string;
   phone?: string | null;
+  message?: string | null;
+  type: string;
   source?: string;
   propertyId?: number | null;
 }
 
-export async function findOrCreateLead({ inquiryId, name, email, phone, source = "web", propertyId }: CreateLeadFromInquiry) {
-  const existing = await prisma.lead.findFirst({
-    where: { email: { equals: email } },
-    orderBy: { updatedAt: "desc" },
-  });
+// A successful form submission must have both a saved inquiry and a linked CRM lead.
+export async function createInquiryWithLead({
+  name,
+  email,
+  phone,
+  message,
+  type,
+  source = "web",
+  propertyId,
+}: CreateInquiryWithLead) {
+  const normalizedEmail = email.trim().toLowerCase();
 
-  if (existing) {
-    const updated = await prisma.lead.update({
-      where: { id: existing.id },
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.lead.findFirst({
+      where: { email: normalizedEmail },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    const lead = existing
+      ? await tx.lead.update({
+          where: { id: existing.id },
+          data: {
+            ...(phone && !existing.phone && { phone }),
+            ...(propertyId && !existing.propertyId && { propertyId }),
+          },
+        })
+      : await tx.lead.create({
+          data: {
+            name,
+            email: normalizedEmail,
+            phone: phone || null,
+            source,
+            propertyId: propertyId || null,
+          },
+        });
+
+    return tx.inquiry.create({
       data: {
-        ...(phone && !existing.phone && { phone }),
-        ...(propertyId && !existing.propertyId && { propertyId }),
+        name,
+        email: normalizedEmail,
+        phone: phone || null,
+        message: message || null,
+        type,
+        propertyId: propertyId || null,
+        leadId: lead.id,
       },
+      include: { property: { select: { title: true } } },
     });
-
-    await prisma.inquiry.update({
-      where: { id: inquiryId },
-      data: { leadId: updated.id },
-    });
-
-    return updated;
-  }
-
-  const lead = await prisma.lead.create({
-    data: {
-      name,
-      email,
-      phone: phone || null,
-      source,
-      propertyId: propertyId || null,
-    },
   });
-
-  await prisma.inquiry.update({
-    where: { id: inquiryId },
-    data: { leadId: lead.id },
-  });
-
-  return lead;
 }

@@ -17,9 +17,14 @@ Este documento sigue los lineamientos de Spec-Driven Development (SDD). Es la fu
 - **Lenguaje**: TypeScript
 - **Estilos**: Vanilla CSS (`globals.css`) y Tailwind CSS (usado principalmente para utilidades de layout en la página de contacto).
 - **Base de Datos / ORM**: 
-  - Prisma (actualmente configurado en modo local con SQLite `prisma/dev.db` para desarrollo/testing).
-  - Supabase (Migración preparada en `supabase/migrations/` y cliente configurado en `src/lib/supabase/admin.ts`, pendiente de adopción total).
-- **Autenticación**: NextAuth (`/api/auth/[...nextauth]`) para proteger el panel `/admin`.
+  - Prisma. En desarrollo usa SQLite local (`prisma/dev.db`).
+  - En producción usa **Turso** (libSQL) mediante `@prisma/adapter-libsql`: `src/lib/prisma.ts` lo activa cuando existe `TURSO_DATABASE_URL`. Prisma CLI 5 no puede hacer `db push` contra Turso; el esquema se crea con `scripts/turso-setup.mjs` y cualquier cambio de esquema hay que aplicarlo ahí también.
+  - Supabase quedó sin uso (el proyecto original ya no existe). El código de `src/lib/supabase/admin.ts` solo se usa si `SUPABASE_STORAGE_ENABLED="true"`.
+- **Hosting**: Vercel (el proyecto está asociado a `main`, pendiente de verificar el despliegue actual). El dominio y el correo siguen en SiteGround. Vercel no tiene disco persistente: nada puede escribirse en `public/` en producción.
+- **Imágenes de propiedades**: Vercel Blob (`BLOB_READ_WRITE_TOKEN`) desde `/api/upload`. El navegador achica las fotos grandes antes de subirlas porque Vercel rechaza pedidos de más de 4.5 MB.
+- **Importador por link** (`src/lib/scraper.ts`): Argenprop y MercadoLibre se leen directo. Zonaprop responde con un desafío de Cloudflare a cualquier servidor, así que el panel ofrece pegar el código fuente de la publicación y se interpreta el objeto `avisoInfo` embebido.
+- **Caché**: la home, las fichas y el sitemap son estáticos. Toda alta, edición o baja de propiedades llama a `revalidatePublicCatalog()` (`src/lib/property-input.ts`).
+- **Autenticación**: NextAuth (`/api/auth/[...nextauth]`) para proteger el panel `/admin`. En producción las credenciales salen de `ADMIN_EMAIL` y `ADMIN_PASSWORD`, no de la tabla `User`. Todas las rutas `/api` del panel exigen sesión.
 - **Manejo de Formularios y Correos**: 
   - `react-hook-form` con validación en `zod`.
   - Endpoint de contacto en `src/app/api/contacto/route.ts` que notifica a `info@boettopropiedades.com` vía Nodemailer (`src/lib/inquiry-email.ts`).
@@ -54,24 +59,22 @@ Este documento sigue los lineamientos de Spec-Driven Development (SDD). Es la fu
 
 ### CI / CD (Build)
 - Errores de sintaxis y compilación resueltos.
-- `npm run lint` y `npx next build` pasan correctamente de forma local. 
-- Vercel realiza deploy automático de la rama `main` sin trabas.
+- El 11 de octubre de 2026 pasaron localmente `npm run lint`, `npx tsc --noEmit`, `npm run build` y `node scripts/smoke-local.mjs` contra `next start`, usando `prisma/audit-test.db` y credenciales de prueba.
+- La prueba integral cubrió sesión admin, alta y edición parcial de propiedades, publicación y pausa con actualización de home/catálogo/ficha, subida de fotos, importación de código de Zonaprop, formulario de consulta, tasación, pipeline, estadísticas y conservación de clientes tras borrar una propiedad.
+- Los formularios guardan la consulta y su lead en una misma transacción (`src/lib/crm-service.ts`); se comprobó que dos consultas del mismo correo quedan ligadas a un único lead.
+- La revisión visual del panel y el pipeline en un viewport de 390 × 844 no mostró bloqueos de uso.
+- No se verificó esta versión en Vercel. La integración devolvió 403 para el equipo `drsaturnos-projects`; el usuario está reconectando el acceso. Aunque `main` está conectado a Vercel, un push no confirma por sí solo que el despliegue haya terminado correctamente.
 
-## 5. Trabajo Pendiente para la Próxima IA (To-Do)
+## 5. Trabajo pendiente en producción
 
-El agente que retome el proyecto deberá consultar al usuario cuál es la prioridad, eligiendo entre:
+1. **Acceso a Vercel**: reconectar la integración con acceso al equipo `drsaturnos-projects`. Hasta que permita leer el proyecto, no se pueden revisar variables, logs ni despliegues. El CLI local tampoco tiene credenciales de ese equipo.
+2. **Base y almacenamiento**: revisar en Vercel `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` y `BLOB_READ_WRITE_TOKEN`. El 11 de octubre de 2026, `https://www.boettopropiedades.com/api/propiedades` respondió 500 y el catálogo publicado mostraba ejemplos ficticios. Esto apunta a una versión vieja o a un problema de base, pero requiere logs y variables para distinguirlo. Aplicar `scripts/turso-setup.mjs` a Turso si faltan tablas; no usar `prisma db push` contra Turso.
+3. **Correo y acceso**: comprobar `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `SMTP_*` e `INQUIRY_EMAIL_TO` sin exponer sus valores. Probar una consulta real después de configurar SMTP.
+4. **Publicación**: comprobar el despliegue disparado por `main` y repetir el recorrido de admin, propiedades y CRM en la URL de Vercel. Verificar que las fotos recién subidas tengan una URL persistente de Vercel Blob.
+5. **Imágenes importadas**: las fotos enlazadas a portales externos pueden dejar de verse cuando se elimina la publicación original; conviene guardarlas en Blob al importar si ese flujo es importante.
 
-1. **Gestión de Entorno y Producción**: 
-   - Terminar la migración de datos hacia **Supabase** para abandonar SQLite en producción (si el usuario así lo requiere).
-   - Reemplazar las credenciales hardcodeadas del admin y el SMTP de `.env` por secretos formales en Vercel.
-2. **Desarrollo del Backend de Propiedades**: 
-   - Habilitar el ABM (Alta, Baja y Modificación) completo en el panel admin para la carga de propiedades reales.
-3. **Páginas Faltantes o Secciones Dinámicas**: 
-   - Poblar la sección `/propiedades` con la conexión a la base de datos real.
-4. **Mantenimiento**: 
-   - Monitorear logs de Vercel en caso de fallos de caché o de conexión a Prisma en producción.
+El catálogo ficticio de `src/data/demo-properties.ts` solo aparece con `CATALOG_DEMO_MODE=true` y sin propiedades publicadas. En modo normal, la base vacía muestra un catálogo vacío y los errores de conexión no se ocultan con ejemplos.
 
 ---
 
-*Fin del SDD y Hand-off.* 
-*Regla obligatoria para la próxima IA: Lee este documento y confía en el estado actual; no rompas el diseño premium ya consolidado.*
+*Fin del SDD y Hand-off.*

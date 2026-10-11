@@ -2,7 +2,38 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ErrorNotice from "@/components/admin/ErrorNotice";
+import { errorMessage, fetchJson, sendJson } from "@/lib/admin-fetch";
 import { OPERATIONS, PROPERTY_TYPES, CURRENCIES, PROPERTY_STATUS, AMENITIES_LIST } from "@/lib/constants";
+
+const MAX_IMAGE_SIDE = 2400;
+const RESIZE_ABOVE_BYTES = 1.5 * 1024 * 1024;
+
+// Phone photos exceed the 4 MB upload limit, so large files are downscaled in the browser first.
+async function prepareImage(file: File): Promise<File> {
+  if (file.size <= RESIZE_ABOVE_BYTES) return file;
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_IMAGE_SIDE / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", 0.85)
+    );
+    if (!blob) return file;
+
+    return new File([blob], `${file.name.replace(/\.[^.]+$/, "")}.jpg`, {
+      type: "image/jpeg",
+    });
+  } catch {
+    return file;
+  }
+}
 
 interface PropertyFormData {
   id?: number;
@@ -53,6 +84,7 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
   const [imageUrl, setImageUrl] = useState("");
   const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   function update<K extends keyof PropertyFormData>(key: K, value: PropertyFormData[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -74,31 +106,20 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
     setUploadingImages(true);
     setUploadError("");
 
+    // One at a time: the images that did upload are kept even if a later one fails.
     try {
-      const uploads = await Promise.all(
-        Array.from(files).map(async (file) => {
-          const payload = new FormData();
-          payload.append("file", file);
+      for (const original of Array.from(files)) {
+        const payload = new FormData();
+        payload.append("file", await prepareImage(original));
 
-          const response = await fetch("/api/upload", {
-            method: "POST",
-            body: payload,
-          });
-          const result = await response.json();
-
-          if (!response.ok || !result.url) {
-            throw new Error(result.error || "No se pudo subir la imagen");
-          }
-
-          return result.url as string;
-        })
-      );
-
-      update("images", [...form.images, ...uploads]);
+        const result = await fetchJson<{ url: string }>("/api/upload", {
+          method: "POST",
+          body: payload,
+        });
+        setForm((current) => ({ ...current, images: [...current.images, result.url] }));
+      }
     } catch (error) {
-      setUploadError(
-        error instanceof Error ? error.message : "No se pudieron subir las imágenes"
-      );
+      setUploadError(errorMessage(error));
     } finally {
       setUploadingImages(false);
     }
@@ -116,34 +137,16 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
     e.preventDefault();
     if (!form.title || !form.operation || !form.propertyType) return;
     setSaving(true);
+    setSaveError("");
 
     const url = isEditing ? `/api/propiedades/${form.id}` : "/api/propiedades";
-    const method = isEditing ? "PUT" : "POST";
 
     try {
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          price: form.price ? Number(form.price) : null,
-          expenses: form.expenses ? Number(form.expenses) : null,
-          totalArea: form.totalArea ? Number(form.totalArea) : null,
-          coveredArea: form.coveredArea ? Number(form.coveredArea) : null,
-          rooms: form.rooms ? Number(form.rooms) : null,
-          bedrooms: form.bedrooms ? Number(form.bedrooms) : null,
-          bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
-          garages: form.garages ? Number(form.garages) : null,
-          age: form.age !== "" ? Number(form.age) : null,
-        }),
-      });
-
-      if (res.ok) {
-        router.push("/admin/propiedades");
-        router.refresh();
-      }
-    } catch {
-      alert("Error al guardar");
+      await sendJson(url, isEditing ? "PUT" : "POST", form);
+      router.push("/admin/propiedades");
+      router.refresh();
+    } catch (error) {
+      setSaveError(errorMessage(error));
     } finally {
       setSaving(false);
     }
@@ -158,43 +161,43 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
         <h2 className="text-lg font-serif font-medium text-brand-dark mb-4">Información principal</h2>
         <div className="space-y-4">
           <div>
-            <label className={labelClass}>Título *</label>
-            <input type="text" required value={form.title} onChange={(e) => update("title", e.target.value)} className={inputClass} />
+            <label htmlFor="property-title" className={labelClass}>Título *</label>
+            <input id="property-title" type="text" required value={form.title} onChange={(e) => update("title", e.target.value)} className={inputClass} />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <label className={labelClass}>Operación *</label>
-              <select value={form.operation} onChange={(e) => update("operation", e.target.value)} className={inputClass}>
+              <label htmlFor="property-operation" className={labelClass}>Operación *</label>
+              <select id="property-operation" value={form.operation} onChange={(e) => update("operation", e.target.value)} className={inputClass}>
                 {OPERATIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass}>Tipo *</label>
-              <select value={form.propertyType} onChange={(e) => update("propertyType", e.target.value)} className={inputClass}>
+              <label htmlFor="property-type" className={labelClass}>Tipo *</label>
+              <select id="property-type" value={form.propertyType} onChange={(e) => update("propertyType", e.target.value)} className={inputClass}>
                 {PROPERTY_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass}>Estado</label>
-              <select value={form.status} onChange={(e) => update("status", e.target.value)} className={inputClass}>
+              <label htmlFor="property-status" className={labelClass}>Estado</label>
+              <select id="property-status" value={form.status} onChange={(e) => update("status", e.target.value)} className={inputClass}>
                 {PROPERTY_STATUS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
             <div>
-              <label className={labelClass}>Moneda</label>
-              <select value={form.currency} onChange={(e) => update("currency", e.target.value)} className={inputClass}>
+              <label htmlFor="property-currency" className={labelClass}>Moneda</label>
+              <select id="property-currency" value={form.currency} onChange={(e) => update("currency", e.target.value)} className={inputClass}>
                 {CURRENCIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <label className={labelClass}>Precio</label>
-              <input type="number" value={form.price} onChange={(e) => update("price", e.target.value)} className={inputClass} />
+              <label htmlFor="property-price" className={labelClass}>Precio</label>
+              <input id="property-price" type="number" min="0" step="any" value={form.price} onChange={(e) => update("price", e.target.value)} className={inputClass} />
             </div>
             <div>
-              <label className={labelClass}>Expensas</label>
-              <input type="number" value={form.expenses} onChange={(e) => update("expenses", e.target.value)} className={inputClass} />
+              <label htmlFor="property-expenses" className={labelClass}>Expensas</label>
+              <input id="property-expenses" type="number" min="0" step="any" value={form.expenses} onChange={(e) => update("expenses", e.target.value)} className={inputClass} />
             </div>
             <div className="flex items-end">
               <label className="flex items-center gap-2 cursor-pointer py-2.5">
@@ -209,36 +212,37 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
       <div className="bg-brand-surface border border-brand-warm-gray/50 p-6">
         <h2 className="text-lg font-serif font-medium text-brand-dark mb-4">Ubicación</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div><label className={labelClass}>Dirección</label><input type="text" value={form.address} onChange={(e) => update("address", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Barrio</label><input type="text" value={form.neighborhood} onChange={(e) => update("neighborhood", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Ciudad</label><input type="text" value={form.city} onChange={(e) => update("city", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Provincia</label><input type="text" value={form.province} onChange={(e) => update("province", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-address" className={labelClass}>Dirección</label><input id="property-address" type="text" value={form.address} onChange={(e) => update("address", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-neighborhood" className={labelClass}>Barrio</label><input id="property-neighborhood" type="text" value={form.neighborhood} onChange={(e) => update("neighborhood", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-city" className={labelClass}>Ciudad</label><input id="property-city" type="text" value={form.city} onChange={(e) => update("city", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-province" className={labelClass}>Provincia</label><input id="property-province" type="text" value={form.province} onChange={(e) => update("province", e.target.value)} className={inputClass} /></div>
         </div>
       </div>
 
       <div className="bg-brand-surface border border-brand-warm-gray/50 p-6">
         <h2 className="text-lg font-serif font-medium text-brand-dark mb-4">Características</h2>
-        <div className="grid grid-cols-3 md:grid-cols-7 gap-4">
-          <div><label className={labelClass}>Sup. total m²</label><input type="number" value={form.totalArea} onChange={(e) => update("totalArea", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Sup. cubierta m²</label><input type="number" value={form.coveredArea} onChange={(e) => update("coveredArea", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Ambientes</label><input type="number" value={form.rooms} onChange={(e) => update("rooms", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Dormitorios</label><input type="number" value={form.bedrooms} onChange={(e) => update("bedrooms", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Baños</label><input type="number" value={form.bathrooms} onChange={(e) => update("bathrooms", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Cocheras</label><input type="number" value={form.garages} onChange={(e) => update("garages", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Antigüedad</label><input type="number" value={form.age} onChange={(e) => update("age", e.target.value)} className={inputClass} /></div>
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-4">
+          <div><label htmlFor="property-total-area" className={labelClass}>Sup. total m²</label><input id="property-total-area" type="number" min="0" step="any" value={form.totalArea} onChange={(e) => update("totalArea", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-covered-area" className={labelClass}>Sup. cubierta m²</label><input id="property-covered-area" type="number" min="0" step="any" value={form.coveredArea} onChange={(e) => update("coveredArea", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-rooms" className={labelClass}>Ambientes</label><input id="property-rooms" type="number" min="0" step="1" value={form.rooms} onChange={(e) => update("rooms", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-bedrooms" className={labelClass}>Dormitorios</label><input id="property-bedrooms" type="number" min="0" step="1" value={form.bedrooms} onChange={(e) => update("bedrooms", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-bathrooms" className={labelClass}>Baños</label><input id="property-bathrooms" type="number" min="0" step="1" value={form.bathrooms} onChange={(e) => update("bathrooms", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-garages" className={labelClass}>Cocheras</label><input id="property-garages" type="number" min="0" step="1" value={form.garages} onChange={(e) => update("garages", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-age" className={labelClass}>Antigüedad</label><input id="property-age" type="number" min="0" step="1" value={form.age} onChange={(e) => update("age", e.target.value)} className={inputClass} /></div>
         </div>
       </div>
 
       <div className="bg-brand-surface border border-brand-warm-gray/50 p-6">
         <h2 className="text-lg font-serif font-medium text-brand-dark mb-4">Descripción</h2>
-        <textarea value={form.description} onChange={(e) => update("description", e.target.value)} rows={6} className={inputClass + " resize-none"} placeholder="Descripción de la propiedad..." />
+        <label htmlFor="property-description" className="sr-only">Descripción de la propiedad</label>
+        <textarea id="property-description" value={form.description} onChange={(e) => update("description", e.target.value)} rows={6} className={inputClass + " resize-none"} placeholder="Descripción de la propiedad..." />
       </div>
 
       <div className="bg-brand-surface border border-brand-warm-gray/50 p-6">
         <h2 className="text-lg font-serif font-medium text-brand-dark mb-4">Amenities</h2>
         <div className="flex flex-wrap gap-2">
           {AMENITIES_LIST.map((a) => (
-            <button key={a} type="button" onClick={() => toggleAmenity(a)} className={`px-3 py-1.5 text-xs border transition-colors ${form.amenities.includes(a) ? "bg-brand-sage text-white border-brand-sage" : "border-brand-warm-gray text-brand-dark/60 hover:border-brand-sage"}`}>
+            <button key={a} type="button" aria-pressed={form.amenities.includes(a)} onClick={() => toggleAmenity(a)} className={`px-3 py-1.5 text-xs border transition-colors ${form.amenities.includes(a) ? "bg-brand-sage text-white border-brand-sage" : "border-brand-warm-gray text-brand-dark/60 hover:border-brand-sage"}`}>
               {a}
             </button>
           ))}
@@ -261,7 +265,7 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
             className={`${inputClass} file:mr-4 file:border-0 file:bg-brand-dark file:px-4 file:py-2 file:text-xs file:font-medium file:text-white`}
           />
           <span className="mt-2 block text-xs text-brand-medium-gray">
-            JPG, PNG, WebP o AVIF. Máximo 10 MB por imagen.
+            JPG, PNG, WebP o AVIF. Las fotos grandes se optimizan automáticamente antes de subir.
           </span>
         </label>
         {uploadingImages && (
@@ -271,14 +275,14 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
           <p className="mb-4 text-sm text-red-600">{uploadError}</p>
         )}
         <div className="flex gap-2 mb-4">
-          <input type="text" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="URL de la imagen" className={inputClass} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImage(); } }} />
+          <input type="url" aria-label="URL de la imagen" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="URL de la imagen" className={inputClass} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImage(); } }} />
           <button type="button" onClick={addImage} className="px-4 py-2 bg-brand-sage text-white text-sm shrink-0 hover:bg-brand-sage-dark transition-colors">Agregar</button>
         </div>
         {form.images.length > 0 && (
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {form.images.map((img, i) => (
               <div key={i} className="relative aspect-[4/3] bg-cover bg-center group" style={{ backgroundImage: `url('${img}')` }}>
-                <button type="button" onClick={() => removeImage(i)} className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">×</button>
+                <button type="button" aria-label={`Quitar imagen ${i + 1}`} onClick={() => removeImage(i)} className="absolute top-1 right-1 w-7 h-7 bg-red-500 text-white rounded-full text-xs opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity flex items-center justify-center">×</button>
               </div>
             ))}
           </div>
@@ -288,9 +292,9 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
       <div className="bg-brand-surface border border-brand-warm-gray/50 p-6">
         <h2 className="text-lg font-serif font-medium text-brand-dark mb-4">Link externo</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div><label className={labelClass}>URL original</label><input type="url" value={form.externalUrl} onChange={(e) => update("externalUrl", e.target.value)} className={inputClass} /></div>
-          <div><label className={labelClass}>Plataforma</label>
-            <select value={form.externalSource} onChange={(e) => update("externalSource", e.target.value)} className={inputClass}>
+          <div><label htmlFor="property-external-url" className={labelClass}>URL original</label><input id="property-external-url" type="url" value={form.externalUrl} onChange={(e) => update("externalUrl", e.target.value)} className={inputClass} /></div>
+          <div><label htmlFor="property-external-source" className={labelClass}>Plataforma</label>
+            <select id="property-external-source" value={form.externalSource} onChange={(e) => update("externalSource", e.target.value)} className={inputClass}>
               <option value="manual">Manual</option>
               <option value="zonaprop">Zonaprop</option>
               <option value="argenprop">Argenprop</option>
@@ -300,8 +304,10 @@ export default function PropertyForm({ initialData, isEditing }: Props) {
         </div>
       </div>
 
-      <div className="flex gap-4">
-        <button type="submit" disabled={saving} className="px-8 py-3 bg-brand-sage text-white text-sm font-medium hover:bg-brand-sage-dark transition-colors disabled:opacity-50">
+      <ErrorNotice message={saveError} />
+
+      <div className="flex flex-wrap gap-4">
+        <button type="submit" disabled={saving || uploadingImages} className="px-8 py-3 bg-brand-sage text-white text-sm font-medium hover:bg-brand-sage-dark transition-colors disabled:opacity-50">
           {saving ? "Guardando..." : isEditing ? "Guardar cambios" : "Crear propiedad"}
         </button>
         <button type="button" onClick={() => router.back()} className="px-8 py-3 border border-brand-warm-gray text-brand-dark text-sm hover:bg-brand-sage hover:text-white hover:border-brand-sage transition-colors">

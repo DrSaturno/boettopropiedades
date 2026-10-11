@@ -7,6 +7,12 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function buildPrisma() {
+  if (process.env.VERCEL && !process.env.TURSO_DATABASE_URL) {
+    throw new Error("Falta TURSO_DATABASE_URL en Vercel: no hay base de datos persistente");
+  }
+  if (process.env.TURSO_DATABASE_URL?.startsWith("libsql://") && !process.env.TURSO_AUTH_TOKEN) {
+    throw new Error("Falta TURSO_AUTH_TOKEN para conectar con Turso");
+  }
   if (process.env.TURSO_DATABASE_URL) {
     const libsql = createClient({
       url: process.env.TURSO_DATABASE_URL,

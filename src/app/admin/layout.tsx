@@ -31,10 +31,10 @@ function AdminGuard({ children }: { children: React.ReactNode }) {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="min-h-screen bg-brand-cream md:flex">
       <AdminSidebar />
-      <div className="flex-1 bg-brand-cream">
-        <div className="p-8">{children}</div>
+      <div className="min-w-0 flex-1">
+        <div className="p-4 md:p-8">{children}</div>
       </div>
     </div>
   );
