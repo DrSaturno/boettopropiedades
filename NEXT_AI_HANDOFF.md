@@ -18,7 +18,7 @@ Este documento sigue los lineamientos de Spec-Driven Development (SDD). Es la fu
 - **Estilos**: Vanilla CSS (`globals.css`) y Tailwind CSS (usado principalmente para utilidades de layout en la página de contacto).
 - **Base de Datos / ORM**: 
   - Prisma. En desarrollo usa SQLite local (`prisma/dev.db`).
-  - En producción usa **Turso** (libSQL) mediante `@prisma/adapter-libsql`: `src/lib/prisma.ts` lo activa cuando existe `TURSO_DATABASE_URL`. Prisma CLI 5 no puede hacer `db push` contra Turso; el esquema se crea con `scripts/turso-setup.mjs` y cualquier cambio de esquema hay que aplicarlo ahí también.
+  - En producción usa **Turso** (libSQL) mediante `@prisma/adapter-libsql`: `src/lib/prisma.ts` lo activa cuando existe `TURSO_DATABASE_URL`. Prisma CLI 5 no puede hacer `db push` contra Turso; `npm run build` ejecuta `scripts/prepare-database.mjs` para crear las tablas faltantes con `scripts/turso-setup.mjs` antes del prerender. Cualquier cambio futuro de esquema necesita una migración explícita.
   - Supabase quedó sin uso (el proyecto original ya no existe). El código de `src/lib/supabase/admin.ts` solo se usa si `SUPABASE_STORAGE_ENABLED="true"`.
 - **Hosting**: Vercel (el proyecto está asociado a `main`, pendiente de verificar el despliegue actual). El dominio y el correo siguen en SiteGround. Vercel no tiene disco persistente: nada puede escribirse en `public/` en producción.
 - **Imágenes de propiedades**: Vercel Blob (`BLOB_READ_WRITE_TOKEN`) desde `/api/upload`. El navegador achica las fotos grandes antes de subirlas porque Vercel rechaza pedidos de más de 4.5 MB.

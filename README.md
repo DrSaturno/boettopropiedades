@@ -27,6 +27,8 @@ Para repetir la prueba integral local, crear primero una base de datos aislada c
 
 Las variables necesarias están descritas en `.env.example`. En Vercel, `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `NEXTAUTH_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` y `BLOB_READ_WRITE_TOKEN` son esenciales para el panel y las fotos. Las variables `SMTP_*` e `INQUIRY_EMAIL_TO` permiten notificar consultas por correo. El catálogo ficticio solo se habilita con `CATALOG_DEMO_MODE=true` mientras no haya publicaciones reales.
 
+Cuando se conecta una base Turso nueva, `npm run build` crea las tablas faltantes antes de prerenderizar las páginas públicas. El script utiliza `CREATE TABLE IF NOT EXISTS`: prepara una base nueva y no altera tablas existentes. Los cambios futuros de esquema requieren una migración explícita.
+
 ## Estructura principal
 
 `src/app/`
