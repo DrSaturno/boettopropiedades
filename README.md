@@ -4,7 +4,7 @@ Sitio web y panel privado de Boetto Propiedades, construido con Next.js.
 
 ## Estado actual
 
-El sitio incluye catálogo y fichas públicas, formularios de contacto y tasación, panel de propiedades, importación desde portales, consultas y CRM con pipeline. El 11 de octubre de 2026 se verificaron estos flujos contra un build local de producción con una base de datos aislada. También se conectaron Turso, Vercel Blob y las variables de correo a Vercel. En producción se probaron el alta y la edición de una propiedad, la subida de fotos, el formulario de contacto, la creación del lead y su cambio de etapa; el destinatario confirmó la recepción del aviso por correo. Se eliminaron los registros de prueba, incluida la foto de Blob, y, a pedido del usuario, las cuatro propiedades de ejemplo. El catálogo quedó vacío para cargar propiedades reales.
+El sitio incluye catálogo y fichas públicas, formularios de contacto y tasación, panel de propiedades, importación desde portales, consultas y CRM con pipeline. El 11 de octubre de 2026 se verificaron estos flujos contra un build local de producción con una base de datos aislada. También se conectaron Turso, Vercel Blob y las variables de correo a Vercel. En producción se probaron el alta y la edición de una propiedad, la subida y eliminación de una foto, el formulario de contacto, la creación del lead y su cambio de etapa; el destinatario confirmó la recepción del aviso por correo. Se eliminaron los registros de prueba y, a pedido del usuario, las cuatro propiedades de ejemplo. El catálogo quedó vacío para cargar propiedades reales.
 
 ## Stack
 
@@ -66,4 +66,4 @@ Puntos de entrada:
 
 ## Notas de validación
 
-El 11 de octubre de 2026 pasaron `npm run lint`, `npx tsc --noEmit`, `npm run build` y `node scripts/smoke-local.mjs` contra `next start`. La prueba cubre publicar, editar, pausar y borrar una propiedad; actualización de la home y la ficha; subida de foto; importación por código pegado; consultas, tasaciones y CRM. Para el estado de producción, consultar `NEXT_AI_HANDOFF.md`.
+El 11 de octubre de 2026 pasaron `npm run lint`, `npx tsc --noEmit`, `npm run build` y `node scripts/smoke-local.mjs` contra `next start` antes del ajuste de limpieza de imágenes. El script incluye ahora comprobaciones de borrado de archivos al quitar una foto o eliminar una propiedad; no se pudo repetir la prueba HTTP local tras ese ajuste porque el entorno bloqueó las conexiones a `localhost`, aunque el build, TypeScript y lint pasaron. La subida y eliminación de una foto sí se verificaron en producción. Para el estado de producción, consultar `NEXT_AI_HANDOFF.md`.
