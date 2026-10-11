@@ -1,10 +1,10 @@
-import FeaturedProperties from "@/components/home/FeaturedProperties";
+import HomeProperties from "@/components/home/HomeProperties";
 import HomeExperience from "@/components/home/HomeExperience";
 
 export default function HomePage() {
   return (
     <HomeExperience
-      featuredProperties={<FeaturedProperties />}
+      homeProperties={<HomeProperties />}
     />
   );
 }

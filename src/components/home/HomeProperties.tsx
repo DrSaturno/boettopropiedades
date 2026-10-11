@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import PropertyCard from "@/components/properties/PropertyCard";
-import { getFeaturedCatalogProperties } from "@/lib/property-catalog";
+import { getHomeCatalogProperties } from "@/lib/property-catalog";
 
-export default async function FeaturedProperties() {
-  const properties = await getFeaturedCatalogProperties();
+export default async function HomeProperties() {
+  await connection();
+  const properties = await getHomeCatalogProperties();
 
   if (properties.length === 0) return null;
 
@@ -19,8 +21,8 @@ export default async function FeaturedProperties() {
               Una selección lista para conocer.
             </h2>
             <p>
-              Propiedades elegidas por su arquitectura, ubicación y calidad
-              espacial.
+              Conocé las propiedades disponibles y encontrá la que va con tu
+              forma de vivir.
             </p>
           </div>
           <Link
@@ -34,7 +36,11 @@ export default async function FeaturedProperties() {
 
         <div className="property-catalog-grid home-properties__grid">
           {properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+            <PropertyCard
+              key={property.id}
+              property={property}
+              imageSizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 25vw"
+            />
           ))}
         </div>
       </div>

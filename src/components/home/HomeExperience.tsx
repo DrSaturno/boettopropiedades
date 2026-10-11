@@ -153,11 +153,11 @@ function SearchIcon() {
 }
 
 interface HomeExperienceProps {
-  featuredProperties: ReactNode;
+  homeProperties: ReactNode;
 }
 
 export default function HomeExperience({
-  featuredProperties,
+  homeProperties,
 }: HomeExperienceProps) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -521,7 +521,7 @@ export default function HomeExperience({
         </div>
       </section>
 
-      {featuredProperties}
+      {homeProperties}
 
       <section className="agency-section agency-section--services">
         <div className="section-shell agency-grid">

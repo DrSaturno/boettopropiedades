@@ -5,9 +5,10 @@ import { formatArea, formatPrice } from "@/lib/utils";
 
 interface Props {
   property: PropertyData;
+  imageSizes?: string;
 }
 
-export default function PropertyCard({ property }: Props) {
+export default function PropertyCard({ property, imageSizes }: Props) {
   const mainImage =
     property.images?.[0] ||
     "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=80";
@@ -22,7 +23,7 @@ export default function PropertyCard({ property }: Props) {
           src={mainImage}
           alt={`Vista de ${property.title}`}
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          sizes={imageSizes ?? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
           className="property-card__image object-cover"
           loading="lazy"
         />

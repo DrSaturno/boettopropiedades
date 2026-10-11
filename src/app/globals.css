@@ -3903,7 +3903,7 @@ textarea:-webkit-autofill {
 }
 
 .agency-home .home-properties__grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .agency-home .closing-panel {
@@ -3930,6 +3930,10 @@ textarea:-webkit-autofill {
 }
 
 @media (max-width: 1100px) {
+  .agency-home .home-properties__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .home-properties__header,
   .home-properties__header > div {
     grid-template-columns: 1fr;

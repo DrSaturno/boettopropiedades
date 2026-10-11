@@ -4,7 +4,7 @@ Sitio web y panel privado de Boetto Propiedades, construido con Next.js.
 
 ## Estado actual
 
-El sitio incluye catálogo y fichas públicas, formularios de contacto y tasación, panel de propiedades, importación desde portales, consultas y CRM con pipeline. El 11 de octubre de 2026 se verificaron estos flujos contra un build local de producción con una base de datos aislada. También se conectaron Turso, Vercel Blob y las variables de correo a Vercel. En producción se probaron el alta y la edición de una propiedad, la subida y eliminación de una foto, el formulario de contacto, la creación del lead y su cambio de etapa; el destinatario confirmó la recepción del aviso por correo. Se eliminaron los registros de prueba y, a pedido del usuario, las cuatro propiedades de ejemplo. El catálogo quedó vacío para cargar propiedades reales.
+El sitio incluye catálogo y fichas públicas, formularios de contacto y tasación, panel de propiedades, importación desde portales, consultas y CRM con pipeline. El 11 de octubre de 2026 se verificaron estos flujos contra un build local de producción con una base de datos aislada. También se conectaron Turso, Vercel Blob y las variables de correo a Vercel. En producción se probaron el alta y la edición de una propiedad, la subida y eliminación de una foto, el formulario de contacto, la creación del lead y su cambio de etapa; el destinatario confirmó la recepción del aviso por correo. Se eliminaron los registros de prueba y, a pedido del usuario, las cuatro propiedades de ejemplo para incorporar publicaciones reales. La home muestra todas las propiedades publicadas si hay hasta ocho; con más de ocho, rota las no destacadas para completar ocho lugares y mantiene visibles todas las destacadas.
 
 ## Stack
 

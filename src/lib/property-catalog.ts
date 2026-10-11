@@ -3,6 +3,7 @@ import "server-only";
 import type { Property } from "@prisma/client";
 import { DEMO_PROPERTIES, findDemoProperty } from "@/data/demo-properties";
 import { prisma } from "@/lib/prisma";
+import { selectHomeProperties } from "@/lib/home-property-selection";
 import { parseJsonField } from "@/lib/utils";
 import type { PropertyData } from "@/types";
 
@@ -193,27 +194,22 @@ export async function getRelatedCatalogProperties(
   ).slice(0, 3);
 }
 
-export async function getFeaturedCatalogProperties() {
+export async function getHomeCatalogProperties() {
   try {
-    const publishedCount = await prisma.property.count({
+    const properties = await prisma.property.findMany({
       where: { status: "published" },
+      orderBy: { createdAt: "desc" },
     });
 
-    if (publishedCount > 0) {
-      const properties = await prisma.property.findMany({
-        where: { status: "published", featured: true },
-        orderBy: { createdAt: "desc" },
-        take: 6,
-      });
-
-      return properties.map(mapDatabaseProperty);
+    if (properties.length > 0) {
+      return selectHomeProperties(properties).map(mapDatabaseProperty);
     }
 
     return demoCatalogEnabled
-      ? DEMO_PROPERTIES.filter((property) => property.featured).slice(0, 6)
+      ? selectHomeProperties(DEMO_PROPERTIES)
       : [];
   } catch (error) {
-    console.error("[home] Unable to load featured properties", error);
+    console.error("[home] Unable to load properties", error);
     throw error;
   }
 }
