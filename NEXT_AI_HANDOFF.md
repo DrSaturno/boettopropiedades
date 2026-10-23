@@ -9,7 +9,8 @@ Este documento sigue los lineamientos de Spec-Driven Development (SDD). Es la fu
 - **Repositorio**: `https://github.com/DrSaturno/boettopropiedades`
 - **Rama activa**: `main`
 - **Último Commit**: (Se actualiza constantemente, ver `git log`)
-- **Propósito**: Sitio web editorial y panel de administración privado para una agencia de "Servicio Inmobiliario" (curaduría) en Capital Federal. El enfoque es premium, minimalista, de alta confianza y orientado a captar consultas estructuradas en lugar de ser un simple catálogo de propiedades masivo.
+- **Propósito**: Sitio web editorial y panel de administración privado para una agencia de "Servicio Inmobiliario" en Capital Federal. El enfoque es premium, minimalista, de alta confianza y orientado a captar consultas estructuradas en lugar de ser un simple catálogo de propiedades masivo.
+- **Regla de redacción**: la palabra "curaduría" (y derivados) no debe aparecer en ningún texto público ni en el SEO, por pedido del cliente. El título del sitio es "Boetto Propiedades | Inmobiliaria en Capital Federal" (`src/app/layout.tsx`, en `title.default` y en `openGraph.title`). Google tarda días o semanas en reflejar un cambio de título.
 
 ## 2. Arquitectura y Stack Tecnológico
 
@@ -51,6 +52,7 @@ Este documento sigue los lineamientos de Spec-Driven Development (SDD). Es la fu
   - Incorpora iconos minimalistas vectoriales en línea (SVG) para Email, Teléfono/WhatsApp, Dirección, Horarios e Instagram.
   - El texto gigante de "BOETTO" fue removido para mayor limpieza visual.
   - Firma `By 🪐 DrSaturno` conectada a `https://www.planetasaturno.com`.
+  - Último renglón (`.footer-modern__bottom`), de izquierda a derecha: "Privacidad · Términos", la firma y el bloque legal `.footer-modern__legal` alineado a la derecha ("© año BOETTO PROPIEDADES. Todos los derechos reservados." y "CUCICBA 9854 Corredor Responsable Julio Cesar Boetto"). En tablet y celular (900 px o menos) la fila se apila y se centra. Tiene 92 px de margen inferior para que el botón flotante de WhatsApp no tape la matrícula al llegar al final de la página.
 
 ### Panel Admin
 - Completamente aislado del diseño público mediante `SiteChrome`. 

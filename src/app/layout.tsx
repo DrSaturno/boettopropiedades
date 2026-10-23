@@ -20,7 +20,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "Boetto Propiedades | Curaduría inmobiliaria en Capital Federal",
+    default: "Boetto Propiedades | Inmobiliaria en Capital Federal",
     template: "%s | Boetto Propiedades",
   },
   description:
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_AR",
     siteName: "Boetto Propiedades",
-    title: "Boetto Propiedades | Curaduría inmobiliaria en Capital Federal",
+    title: "Boetto Propiedades | Inmobiliaria en Capital Federal",
     description: "Propiedades con arquitectura, contexto y carácter en Capital Federal.",
   },
 };

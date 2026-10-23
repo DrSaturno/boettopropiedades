@@ -92,13 +92,16 @@ export default function Footer() {
       </div>
 
       <div className="footer-modern__bottom">
-        <span>© {new Date().getFullYear()} Boetto Propiedades</span>
+        <span>Privacidad · Términos</span>
         <span>
           <a href="https://www.planetasaturno.com" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "none" }} className="hover:text-white transition-colors">
             By <span style={{ filter: "grayscale(1) brightness(10)", margin: "0 2px", display: "inline-block" }}>🪐</span> DrSaturno
           </a>
         </span>
-        <span>Privacidad · Términos</span>
+        <span className="footer-modern__legal">
+          <span>© {new Date().getFullYear()} BOETTO PROPIEDADES. Todos los derechos reservados.</span>
+          <span>CUCICBA 9854 Corredor Responsable Julio Cesar Boetto</span>
+        </span>
       </div>
     </footer>
   );
