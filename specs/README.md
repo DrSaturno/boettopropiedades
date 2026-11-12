@@ -19,3 +19,6 @@ Documenta la persistencia y notificación SMTP de consultas al correo comercial.
 
 `2026-07-27-brand-siteground-supabase`
 Documenta la identidad negro/dorado/blanco, el correo del hosting y la migración operativa a Supabase.
+
+`2026-11-11-property-flyers`
+Documenta el generador de folletos PDF de las propiedades, con las plantillas con y sin precio.
